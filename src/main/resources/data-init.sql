@@ -1,4 +1,4 @@
-INSERT INTO race (nom) VALUES
-     ('Valentin'),
-     ('Yannick'),
-     ('Franck');
+INSERT INTO race (id, nom) VALUES
+     (1,'Valentin'),
+     (2,'Yannick'),
+     (3,'Franck');
