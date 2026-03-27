@@ -1,5 +1,7 @@
 package edu.mns.cda.clubcaninbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.clubcaninbackend.view.ChienView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -19,8 +21,10 @@ public class Race {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Integer id;
 
+    @Column(length = 20,nullable = false, unique = true)
     @NotBlank
-    @Length(max = 50)
+    @Length(min = 3, max = 30)
+    @JsonView(ChienView.class) // a confirmer je suis pas sur
     protected String nom;
 
 }
