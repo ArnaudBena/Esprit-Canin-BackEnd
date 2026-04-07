@@ -1,3 +1,3 @@
 package edu.mns.cda.clubcaninbackend.view;
 
-public interface ChienView {}
+public interface TypeSeanceView {}
