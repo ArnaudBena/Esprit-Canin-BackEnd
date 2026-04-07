@@ -1,8 +1,5 @@
 package edu.mns.cda.clubcaninbackend.model;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.clubcaninbackend.view.ChienView;
-import edu.mns.cda.clubcaninbackend.view.RaceView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

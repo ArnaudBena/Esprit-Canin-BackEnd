@@ -4,7 +4,6 @@ package edu.mns.cda.clubcaninbackend.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.dao.RaceDao;
 import edu.mns.cda.clubcaninbackend.model.Race;
-import edu.mns.cda.clubcaninbackend.view.RaceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,13 +27,11 @@ public class RaceController {
 
 
     @GetMapping("/list")
-    @JsonView(RaceView.class)
     public List<Race> getAllRaces() {
         return raceDao.findAll();
     }
 
     @GetMapping("/{id}")
-    @JsonView(RaceView.class)
     @Operation(
             summary = "Fetch race par id",
             description = "Fetch de la race par l'id dans l'URL'"
@@ -56,7 +53,6 @@ public class RaceController {
     }
 
     @PostMapping()
-    @JsonView(RaceView.class)
     public ResponseEntity<Race> createRace(
             @RequestBody
             @Valid() // vérif à effectuer ici

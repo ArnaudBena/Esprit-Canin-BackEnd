@@ -15,7 +15,7 @@ import org.hibernate.validator.constraints.Length;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Race {
+public class Competence {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
