@@ -21,6 +21,7 @@ import java.util.Optional;
 @Tag(name = "Race", description = "API pour manipuler les races")
 @RequiredArgsConstructor
 @RequestMapping("/race")
+@CrossOrigin
 public class RaceController {
 
     protected final RaceDao raceDao;

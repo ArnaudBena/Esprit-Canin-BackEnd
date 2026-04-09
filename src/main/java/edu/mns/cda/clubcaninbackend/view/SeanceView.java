@@ -1,4 +1,3 @@
 package edu.mns.cda.clubcaninbackend.view;
 
-public interface SeanceView {
-}
+public interface SeanceView {}

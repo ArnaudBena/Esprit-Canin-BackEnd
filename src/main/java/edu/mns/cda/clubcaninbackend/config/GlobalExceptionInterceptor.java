@@ -14,7 +14,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionInterceptor {
 
-    //intercepte les exceptions du à un JSON qui ne respecte pas des contraintes (@NotBlank, @Size...)
+    //Intercepte les exceptions du à un JSON qui ne respecte pas des contraintes (@NotBlank, @Size...)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> constraintViolationInterceptor(MethodArgumentNotValidException ex) {
