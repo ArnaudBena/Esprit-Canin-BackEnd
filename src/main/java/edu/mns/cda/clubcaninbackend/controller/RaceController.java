@@ -53,7 +53,7 @@ public class RaceController {
 
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<Race> createRace(
             @RequestBody
             @Valid() // vérif à effectuer ici

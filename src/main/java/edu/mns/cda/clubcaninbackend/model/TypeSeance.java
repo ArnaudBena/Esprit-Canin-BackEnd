@@ -3,6 +3,7 @@ package edu.mns.cda.clubcaninbackend.model;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.clubcaninbackend.view.ChienView;
+import edu.mns.cda.clubcaninbackend.view.SeanceView;
 import edu.mns.cda.clubcaninbackend.view.TypeSeanceView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -27,7 +28,7 @@ public class TypeSeance {
 
     @Column(nullable = false, unique = true)
     @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le libellé du cours ne peut pas être vide")
-    @JsonView(TypeSeanceView.class)
+    @JsonView({TypeSeanceView.class, SeanceView.class})
     protected String libelle;
 
     @Column(columnDefinition = "TEXT")
@@ -51,7 +52,7 @@ public class TypeSeance {
     protected int dureeMaximale;
 
     @Min(value = 1, groups = {ValidationGroupe.OnCreate.class}, message = "Le nombre de participants minimum ne peut pas être inférieur à 1")
-    @JsonView(TypeSeanceView.class)
+    @JsonView({TypeSeanceView.class, SeanceView.class})
     protected int participantsMinimum;
 
     @Max(value = 10, groups = {ValidationGroupe.OnCreate.class}, message = "Le nombre de participants maximum ne peut pas être supérieur à 10")
