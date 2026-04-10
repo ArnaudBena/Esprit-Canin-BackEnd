@@ -1,7 +1,7 @@
 package edu.mns.cda.clubcaninbackend.model;
 
 public enum StatutSeance {
-    DISPONNIBLE,
+    DISPONIBLE,
     COMPLET,
     TERMINEE,
     ANNULEE

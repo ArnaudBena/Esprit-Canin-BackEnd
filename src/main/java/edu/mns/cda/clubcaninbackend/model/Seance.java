@@ -10,11 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -53,4 +50,9 @@ public class Seance {
     @Column(nullable = false)
     protected StatutSeance statut;
 
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_typeseance", nullable = false)
+    @JsonView(SeanceView.class)
+    protected TypeSeance typeSeance;
 }

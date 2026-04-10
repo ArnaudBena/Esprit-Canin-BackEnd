@@ -19,7 +19,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Integer id;
 
-    @Column(length = 20,nullable = false, unique = true)
+    @Column(length = 30,nullable = false, unique = true)
     @NotBlank
     @Length(min = 3, max = 30)
 //    @JsonView(UtilisateurView.class)  << future implémentation de la classe Utilisateur
