@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,25 +38,33 @@ public class TypeSeance {
 
     @Min(value = 0, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "L'âge minimum ne peut pas être négatif")
     @JsonView(TypeSeanceView.class)
-    protected int ageMinimum;
+    protected Integer ageMinimum;
 
     @Max(value = 30, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "L'âge maximum ne peut pas dépasser 30 ans")
     @JsonView(TypeSeanceView.class)
-    protected int ageMaximum;
+    protected Integer ageMaximum;
 
+    @NotNull
+    @Column(nullable = false)
     @Min(value = 30,groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "La durée minimale ne peut pas être inférieure à 30 mins")
     @JsonView(TypeSeanceView.class)
-    protected int dureeMinimale;
+    protected Integer dureeMinimale;
 
+    @NotNull
+    @Column(nullable = false)
     @Max(value = 240, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "La durée maximale ne peut pas être supérieure à 4h")
     @JsonView(TypeSeanceView.class)
-    protected int dureeMaximale;
+    protected Integer dureeMaximale;
 
+    @NotNull
+    @Column(nullable = false)
     @Min(value = 1, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le nombre de participants minimum ne peut pas être inférieur à 1")
     @JsonView({TypeSeanceView.class, SeanceView.class})
-    protected int participantsMinimum;
+    protected Integer participantsMinimum;
 
+    @NotNull
+    @Column(nullable = false)
     @Max(value = 10, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le nombre de participants maximum ne peut pas être supérieur à 10")
     @JsonView(TypeSeanceView.class)
-    protected int participantsMaximum;
+    protected Integer participantsMaximum;
 }

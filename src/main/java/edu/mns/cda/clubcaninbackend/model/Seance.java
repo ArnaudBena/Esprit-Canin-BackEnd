@@ -2,6 +2,7 @@ package edu.mns.cda.clubcaninbackend.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.clubcaninbackend.view.SeanceView;
 import edu.mns.cda.clubcaninbackend.view.TypeSeanceView;
 import jakarta.persistence.*;
@@ -10,15 +11,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-
 public class Seance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,33 +29,48 @@ public class Seance {
     protected Integer id;
 
     @NotNull
-    @FutureOrPresent
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    @JsonView(SeanceView.class)
+    @FutureOrPresent(groups = ValidationGroupe.OnCreate.class)
     @Column(nullable = false)
-    protected LocalDateTime date;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonView(SeanceView.class)
+    protected LocalDate date;
 
     @NotNull
-    @JsonFormat(pattern = "HH:mm")
-    @JsonView(SeanceView.class)
     @Column(nullable = false)
+    @JsonFormat(pattern = "HH:mm:ss")
+    @JsonView(SeanceView.class)
     protected LocalTime heureDebut;
 
     @NotNull
+    @Column(nullable = false)
     @Min(value = 1, message = "La durée doit être positive")
     @JsonView(SeanceView.class)
-    @Column(nullable = false)
     protected Integer dureeMinutes;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @JsonView(SeanceView.class)
     @Column(nullable = false)
+    @JsonView(SeanceView.class)
     protected StatutSeance statut;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "id_typeseance", nullable = false)
+    @JoinColumn(name = "id_type_seance", nullable = false)
     @JsonView(SeanceView.class)
     protected TypeSeance typeSeance;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_coach", nullable = false)
+    @JsonView(SeanceView.class)
+    protected Utilisateur coach;
+
+    @ManyToMany
+    @JoinTable(
+            name = "seance_competence",
+            joinColumns = @JoinColumn(name = "id_seance"),
+            inverseJoinColumns = @JoinColumn(name = "id_competence")
+    )
+    @JsonView(SeanceView.class)
+    protected Set<Competence> competences;
 }

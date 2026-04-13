@@ -24,37 +24,50 @@ public class Chien {
     @JsonView(ChienView.class)
     protected Integer id;
 
-    @Column(nullable = false, unique = true)
-    @NotBlank(groups = ValidationGroupe.OnCreate.class)
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
+    @Column(nullable = false, length = 50)
     @JsonView({ChienView.class, SeanceView.class})
     protected String nom;
 
     @NotNull
-    @Min(value = 1, message = "Le poid doit être positif")
-    @JsonView({ChienView.class, SeanceView.class})
     @Column(nullable = false)
+    @Positive(message = "Le poids doit être positif")
+    @JsonView({ChienView.class, SeanceView.class})
     protected Double poids;
 
     @NotNull
-    @Min(value = 1, message = "La taille doit être positive")
-    @JsonView({ChienView.class, SeanceView.class})
     @Column(nullable = false)
+    @Positive(message = "La taille doit être positive")
+    @JsonView({ChienView.class, SeanceView.class})
     protected Double taille;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @JsonView(ChienView.class)
     @Column(nullable = false)
+    @JsonView(ChienView.class)
     protected Sexe sexe;
 
     @NotNull
     @PastOrPresent
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @Column(nullable = false, updatable = false)
     @JsonView(ChienView.class)
-    @Column(nullable = false)
     protected LocalDate dateNaissance;
 
-    @JsonView(ChienView.class)
+    @Column(unique = true, length = 30)
     @Size(max = 30, message = "Le numéro de puce ne peut pas depasser 30 caractères")
+    @JsonView(ChienView.class)
     protected String numeroPuce;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_utilisateur", nullable = false)
+    @JsonView(ChienView.class)
+    protected Utilisateur utilisateur;
+
+    @NotNull
+    @ManyToOne
+    @JoinColumn(name = "id_race", nullable = false)
+    @JsonView(ChienView.class)
+    protected Race race;
 }
