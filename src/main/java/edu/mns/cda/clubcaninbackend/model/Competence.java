@@ -30,4 +30,8 @@ public class Competence {
     @Length(min = 3, max = 50)
     @JsonView({ChienView.class, CompetenceView.class})
     protected String nom;
+
+    @Column(columnDefinition = "TEXT")
+    @JsonView({ChienView.class, CompetenceView.class})
+    protected String description;
 }
