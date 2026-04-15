@@ -30,8 +30,4 @@ public class Competence {
     @Length(min = 3, max = 50)
     @JsonView({ChienView.class, CompetenceView.class})
     protected String nom;
-
-    @ManyToMany(mappedBy = "competences")
-    @JsonView(CompetenceView.class)
-    protected Set<Seance> seances;
 }

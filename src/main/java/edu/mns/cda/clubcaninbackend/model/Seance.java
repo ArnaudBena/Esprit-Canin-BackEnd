@@ -15,7 +15,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Set;
+
 
 @Getter
 @Setter
@@ -65,12 +65,4 @@ public class Seance {
     @JsonView(SeanceView.class)
     protected Utilisateur coach;
 
-    @ManyToMany
-    @JoinTable(
-            name = "seance_competence",
-            joinColumns = @JoinColumn(name = "id_seance"),
-            inverseJoinColumns = @JoinColumn(name = "id_competence")
-    )
-    @JsonView(SeanceView.class)
-    protected Set<Competence> competences;
 }
