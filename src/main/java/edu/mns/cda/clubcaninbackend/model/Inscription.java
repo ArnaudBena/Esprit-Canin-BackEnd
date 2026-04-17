@@ -34,7 +34,7 @@ public class Inscription {
         @Column(name = "id_chien")
         protected Integer chienId;
 
-        @Column(name = " id_seance")
+        @Column(name = "id_seance")
         protected Integer seanceId;
     }
 
