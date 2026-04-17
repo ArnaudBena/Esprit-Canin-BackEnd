@@ -32,6 +32,5 @@ public class Race {
     protected String nom;
 
     @OneToMany(mappedBy = "race")
-    @JsonView(RaceView.class)
     protected List<Chien> chiens;
 }

@@ -1,5 +1,6 @@
 package edu.mns.cda.clubcaninbackend.config;
 
+import edu.mns.cda.clubcaninbackend.exception.SeanceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -34,5 +35,11 @@ public class GlobalExceptionInterceptor {
 
 
         return Map.of("Erreur", "Erreur de contrainte dans la base de données");
+    }
+
+    @ExceptionHandler(SeanceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> seanceNotFound(SeanceNotFoundException ex) {
+        return Map.of("Erreur", ex.getMessage());
     }
 }

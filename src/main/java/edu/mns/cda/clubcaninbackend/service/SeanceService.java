@@ -1,8 +1,8 @@
 package edu.mns.cda.clubcaninbackend.service;
 
 import edu.mns.cda.clubcaninbackend.dao.SeanceDao;
+import edu.mns.cda.clubcaninbackend.exception.SeanceNotFoundException;
 import edu.mns.cda.clubcaninbackend.model.Seance;
-import edu.mns.cda.clubcaninbackend.model.TypeSeance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,8 +13,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class SeanceService {
-
-    public static class SeanceNotFoundException extends Exception {}
 
     protected final SeanceDao seanceDao;
 
@@ -32,11 +30,11 @@ public class SeanceService {
         seanceDao.deleteById(id);
     }
 
-    public void update(int id, Seance seanceToUpdate) throws SeanceNotFoundException {
+    public void update(int id, Seance seanceToUpdate) {
         Optional<Seance> optionalSeance = seanceDao.findById(id);
 
         if(optionalSeance.isEmpty()) {
-            throw new SeanceNotFoundException();
+            throw new SeanceNotFoundException(id);
         }
 
         seanceToUpdate.setId(id);
@@ -44,7 +42,7 @@ public class SeanceService {
         seanceDao.save(seanceToUpdate);
     }
 
-    private void  validerDuree(Seance seance) {
+    private void validerDuree(Seance seance) {
         if (seance.getTypeSeance() == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,

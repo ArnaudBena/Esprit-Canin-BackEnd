@@ -12,7 +12,6 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -46,5 +45,5 @@ public class Competence {
 
     @OneToMany(mappedBy = "competence")
     @JsonView(CompetenceView.class)
-    protected List<TypeSeanceCompetenceConferee> typeSeancesCompetenceConferees;
+    protected List<TypeSeanceCompetenceConferee> typeSeancesCompetencesConferees;
 }

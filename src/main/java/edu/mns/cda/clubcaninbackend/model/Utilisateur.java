@@ -1,6 +1,5 @@
 package edu.mns.cda.clubcaninbackend.model;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.dao.RaceDao;
 import edu.mns.cda.clubcaninbackend.model.Race;
 import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
+import edu.mns.cda.clubcaninbackend.view.RaceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -51,7 +52,7 @@ public class RaceController {
                     description = "Liste retournée avec succès"
             )
     })
-
+    @JsonView(RaceView.class)
     public List<Race> getAllRaces() {
         return raceDao.findAll();
     }
@@ -73,10 +74,10 @@ public class RaceController {
                     responseCode = "404",
                     description = "Aucune race ne correspond à cet ID")
     })
-
+    @JsonView(RaceView.class)
     public ResponseEntity<Race> get(
             @Parameter(description = "Identifiant unique de la race", required = true, example = "1")
-            @PathVariable int id
+            @PathVariable Integer id
     ) {
 
         Optional<Race> optionalRace = raceDao.findById(id);
@@ -108,6 +109,7 @@ public class RaceController {
                     description = "Corps de la requête invalide ou champs manquants"
             )
     })
+    @JsonView(RaceView.class)
     public ResponseEntity<Race> createRace(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Objet Race à créer. L'ID sera ignoré."
@@ -144,7 +146,7 @@ public class RaceController {
     })
     public ResponseEntity<Race> deleteRace(
             @Parameter(description = "Identifiant unique de la race à supprimer", required = true, example = "1")
-            @PathVariable int id) {
+            @PathVariable Integer id) {
 
         Optional<Race> optionalRace = raceDao.findById(id);
 
@@ -183,7 +185,7 @@ public class RaceController {
     })
     public ResponseEntity<Void> updateRace(
             @Parameter(description = "Identifiant unique de la race à mettre à jour", required = true, example = "1")
-            @PathVariable int id,
+            @PathVariable Integer id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Objet Race avec les nouvelles valeurs. L'ID sera écrasé par celui d l'URL.",
                     required = true
@@ -200,9 +202,6 @@ public class RaceController {
 
         // On écrase l'id du json par celui en paramètre
         raceToUpdate.setId(id);
-
-        // On réaffecte les anciennes valeurs qui ne doivent pas être changé
-        raceToUpdate.setNom(raceToUpdate.getNom());
 
         raceDao.save(raceToUpdate);
 
