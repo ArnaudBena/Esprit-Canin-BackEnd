@@ -5,7 +5,6 @@ import edu.mns.cda.clubcaninbackend.view.RoleView;
 import edu.mns.cda.clubcaninbackend.view.UtilisateurView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,9 +34,7 @@ public class Role {
     @JsonView({UtilisateurView.class, RoleView.class})
     protected String description;
 
-
     @OneToMany(mappedBy = "role")
-    @JsonView(RoleView.class)
     protected List<Utilisateur> utilisateurs;
 
 }

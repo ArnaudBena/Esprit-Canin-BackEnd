@@ -1,16 +1,12 @@
 package edu.mns.cda.clubcaninbackend.controller;
 
-
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.clubcaninbackend.dao.RaceDao;
-import edu.mns.cda.clubcaninbackend.model.Race;
+import edu.mns.cda.clubcaninbackend.dao.RoleDao;
+import edu.mns.cda.clubcaninbackend.model.Role;
 import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
-import edu.mns.cda.clubcaninbackend.view.RaceView;
+import edu.mns.cda.clubcaninbackend.view.RoleView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,25 +21,25 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@Tag(name = "Race", description = """
-        API de gestion des races canines.
-        Permet de récupérer, créer, modifier et supprimer des races.
-        Toutes les réponses sont au format JSON.
+@Tag(name = "Role", description = """
+        API de gestion des roles du club canin.
+        Permet de récupérer, créer, modifier et supprimer des roles.
+        Toutes les réponses sont au format JSON.        
         """)
 @RequiredArgsConstructor
-@RequestMapping("/race")
+@RequestMapping("/role")
 @CrossOrigin
-public class RaceController {
+public class RoleController {
 
-    protected final RaceDao raceDao;
+    protected final RoleDao roleDao;
 
     @GetMapping("/list")
     @Operation(
-            summary = "Lister toutes les races",
+            summary = "Lister tous les roles",
             description = """
-                    Retourne la liste complète de toutes les races enregistrées en base.
+                    Retourne la liste complète de tous les roles enregistrés en base.
                     Aucun paramètre requis.
-                    Retourne un tableau vide si aucune race n'existe
+                    Retourne un tableau vide si aucun role n'existe
                     """
     )
     @ApiResponses(value = {
@@ -52,49 +48,49 @@ public class RaceController {
                     description = "Liste retournée avec succès"
             )
     })
-    @JsonView(RaceView.class)
-    public List<Race> getAllRaces() {
-        return raceDao.findAll();
+    @JsonView(RoleView.class)
+    public List<Role> getAllRoles() {
+        return roleDao.findAll();
     }
 
     @GetMapping("/{id}")
     @Operation(
-            summary = "Récuperer une race par son ID",
+            summary = "Récuperer un role par son ID",
             description = """
-                    Retourne les détails d'une race à partir de son identifiant unique passé en paramètre de chemin (path variable).
+                    Retourne les détails d'un role à partir de son identifiant unique passé en paramètre de chemin (path variable).
                     Retourne une erreur 404 si l'ID est introuvable en base.
                     """
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Race trouvée et retournée avec succès"
+                    description = "Role trouvé et retourné avec succès"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Aucune race ne correspond à cet ID"
+                    description = "Aucun role ne correspond à cet ID"
             )
     })
-    @JsonView(RaceView.class)
-    public ResponseEntity<Race> get(
-            @Parameter(description = "Identifiant unique de la race", required = true, example = "1")
+    @JsonView(RoleView.class)
+    public ResponseEntity<Role> get(
+            @Parameter(description = "Identifiant unique sur le role", required = true, example = "1")
             @PathVariable Integer id
     ) {
 
-        Optional<Race> optionalRace = raceDao.findById(id);
+        Optional<Role> optionalRole = roleDao.findById(id);
 
-        if(optionalRace.isEmpty()) {
+        if (optionalRole.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(optionalRace.get(), HttpStatus.OK);
+        return new ResponseEntity<>(optionalRole.get(), HttpStatus.OK);
     }
 
     @PostMapping
     @Operation(
-            summary = "Créer une nouvelle race",
+            summary = "Créer un nouveau role",
             description = """
-                    Crée une nouvelle race à partir du corps de la requête au format JSON.
+                    Crée un nouveau role à partir du corps de la requête au format JSON.
                     L'ID fourni dans le corps est ignoré : il sera généré automatiquement par la base (autoincrémenté).
                     Les champs obligatoire sont validés via @Valid.
                     """
@@ -102,34 +98,34 @@ public class RaceController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201",
-                    description = "Race crée avec succès"
+                    description = "Role crée avec succès"
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Corps de la requête invalide ou champs manquants"
             )
     })
-    @JsonView(RaceView.class)
-    public ResponseEntity<Race> createRace(
+    @JsonView(RoleView.class)
+    public ResponseEntity<Role> createRole(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Objet Race à créer. L'ID sera ignoré."
+                    description = "Objet role à créer. L'ID sera ignoré"
             )
             @RequestBody
-            @Valid Race raceToInsert
+            @Valid Role roleToInsert
     ) {
 
-        raceToInsert.setId(null);
+        roleToInsert.setId(null);
 
-        raceDao.save(raceToInsert);
+        roleDao.save(roleToInsert);
 
-        return new ResponseEntity<>(raceToInsert, HttpStatus.CREATED);
+        return new ResponseEntity<>(roleToInsert, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     @Operation(
-            summary = "Supprimer une race par son ID",
+            summary = "Supprimer un role par son ID",
             description = """
-                    Supprime définitevement la race correspondant à l'ID passé en path variable.
+                    Supprime définitevement le role correspondant à l'ID passé en path variable.
                     Retourne une erreur 404 s i l'ID est introuvable en base.
                     Retourne un statut 204 sans corps de réponse si la suppression est réussie.                    
                     """
@@ -137,34 +133,34 @@ public class RaceController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "204",
-                    description = "Race supprimée avec succès, aucun contenu retourné"
+                    description = "Role supprimé avec succès, aucun contenu retourné"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Aucune race ne correspond à cet ID"
+                    description = "Aucun role ne correspond à cet ID"
             )
     })
-    public ResponseEntity<Race> deleteRace(
-            @Parameter(description = "Identifiant unique de la race à supprimer", required = true, example = "1")
+    public ResponseEntity<Role> deleteRole(
+            @Parameter(description = "Identifiant unique du role a supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
 
-        Optional<Race> optionalRace = raceDao.findById(id);
+        Optional<Role> optionalRole = roleDao.findById(id);
 
-        if(optionalRace.isEmpty()) {
+        if (optionalRole.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        raceDao.deleteById(id);
+        roleDao.deleteById(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
     @Operation(
-            summary = "Mettre à jour une race existante",
+            summary = "Mettre à jour un role existant",
             description = """
-                    Met à jour les informations d'une race existante identifée par son ID.
+                    Met à jour les informations d'un role existant identifée par son ID.
                     L'ID du corps JSON est écrasé par celui de l'URL pour éviter toute incohérence.
                     Retourne une erreur 404 si l'ID est introuvable en base.
                     Retourne un statut 204 sans corps de réponse si la mise à jour est réussie.
@@ -173,40 +169,38 @@ public class RaceController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "204",
-                    description = "Race mise à jour avec succès, aucun contenu retourné"
+                    description = "Role mis à jour avec succès, aucun contenu retourné"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Aucune race ne correspond à cet ID"
+                    description = "Aucun role ne correspond à cet ID"
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Corps de la requête invalide ou champs manquants"
             )
     })
-    public ResponseEntity<Void> updateRace(
-            @Parameter(description = "Identifiant unique de la race à mettre à jour", required = true, example = "1")
+    public ResponseEntity<Void> updateRole(
+            @Parameter(description = "Identifiant unique du role à mettre à jour", required = true, example = "1")
             @PathVariable Integer id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Objet Race avec les nouvelles valeurs. L'ID sera écrasé par celui de l'URL.",
+                    description = "Objet Role avec les nouvelles valeurs. L'ID sera écrasé par celui de l'URL",
                     required = true
             )
             @RequestBody
             @Validated(ValidationGroupe.OnUpdate.class)
-            Race raceToUpdate) {
+            Role roleToUpdate
+    ) {
+        Optional<Role> optionalRole = roleDao.findById(id);
 
-        Optional<Race> optionalRace = raceDao.findById(id);
-
-        if(optionalRace.isEmpty()) {
+        if (optionalRole.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // On écrase l'id du json par celui en paramètre
-        raceToUpdate.setId(id);
+        roleToUpdate.setId(id);
 
-        raceDao.save(raceToUpdate);
+        roleDao.save(roleToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 }
