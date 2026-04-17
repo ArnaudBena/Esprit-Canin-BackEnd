@@ -15,6 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -67,4 +69,12 @@ public class TypeSeance {
     @Max(value = 10, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le nombre de participants maximum ne peut pas être supérieur à 10")
     @JsonView(TypeSeanceView.class)
     protected Integer participantsMaximum;
+
+    @OneToMany(mappedBy = "typeSeance")
+    @JsonView(TypeSeanceView.class)
+    protected List<TypeSeanceCompetence> typeSeancesCompetences;
+
+    @OneToMany(mappedBy = "typeSeance")
+    @JsonView(TypeSeanceView.class)
+    protected List<TypeSeanceCompetenceConferee> typeSeancesCompetencesConferees;
 }

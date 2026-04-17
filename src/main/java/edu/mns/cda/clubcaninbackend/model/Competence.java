@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -34,4 +35,16 @@ public class Competence {
     @Column(columnDefinition = "TEXT")
     @JsonView({ChienView.class, CompetenceView.class})
     protected String description;
+
+    @OneToMany(mappedBy = "competence")
+    @JsonView(CompetenceView.class)
+    protected List<ChienCompetence> chienCompetences;
+
+    @OneToMany(mappedBy = "competence")
+    @JsonView(CompetenceView.class)
+    protected List<TypeSeanceCompetence> typeSeancesCompetences;
+
+    @OneToMany(mappedBy = "competence")
+    @JsonView(CompetenceView.class)
+    protected List<TypeSeanceCompetenceConferee> typeSeancesCompetenceConferees;
 }

@@ -3,6 +3,7 @@ package edu.mns.cda.clubcaninbackend.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
+import edu.mns.cda.clubcaninbackend.view.CompetenceView;
 import edu.mns.cda.clubcaninbackend.view.SeanceView;
 import edu.mns.cda.clubcaninbackend.view.TypeSeanceView;
 import jakarta.persistence.*;
@@ -65,4 +66,7 @@ public class Seance {
     @JsonView(SeanceView.class)
     protected Utilisateur coach;
 
+    @OneToMany(mappedBy = "seance")
+    @JsonView(SeanceView.class)
+    protected List<Inscription> inscriptions;
 }
