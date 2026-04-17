@@ -36,7 +36,6 @@ public class RaceController {
 
     protected final RaceDao raceDao;
 
-
     @GetMapping("/list")
     @Operation(
             summary = "Lister toutes les races",
