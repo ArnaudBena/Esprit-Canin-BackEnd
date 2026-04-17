@@ -36,14 +36,11 @@ public class Competence {
     protected String description;
 
     @OneToMany(mappedBy = "competence")
-    @JsonView(CompetenceView.class)
     protected List<ChienCompetence> chienCompetences;
 
     @OneToMany(mappedBy = "competence")
-    @JsonView(CompetenceView.class)
     protected List<TypeSeanceCompetence> typeSeancesCompetences;
 
     @OneToMany(mappedBy = "competence")
-    @JsonView(CompetenceView.class)
     protected List<TypeSeanceCompetenceConferee> typeSeancesCompetencesConferees;
 }

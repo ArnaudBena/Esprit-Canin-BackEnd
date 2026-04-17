@@ -1,16 +1,12 @@
 package edu.mns.cda.clubcaninbackend.controller;
 
-
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.clubcaninbackend.dao.RaceDao;
-import edu.mns.cda.clubcaninbackend.model.Race;
+import edu.mns.cda.clubcaninbackend.dao.CompetenceDao;
+import edu.mns.cda.clubcaninbackend.model.Competence;
 import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
-import edu.mns.cda.clubcaninbackend.view.RaceView;
+import edu.mns.cda.clubcaninbackend.view.CompetenceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,25 +21,25 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@Tag(name = "Race", description = """
-        API de gestion des races canines.
-        Permet de récupérer, créer, modifier et supprimer des races.
-        Toutes les réponses sont au format JSON.
+@Tag(name = "Competence", description = """
+        API de gestion des competences du club canin.
+        Permet de récupérer, créer, modifier et supprimer des competences.
+        Toutes les réponses sont au format JSON.        
         """)
 @RequiredArgsConstructor
-@RequestMapping("/race")
+@RequestMapping("/competence")
 @CrossOrigin
-public class RaceController {
+public class CompetenceController {
 
-    protected final RaceDao raceDao;
+    protected final CompetenceDao competenceDao;
 
     @GetMapping("/list")
     @Operation(
-            summary = "Lister toutes les races",
+            summary = "Lister toutes les competences",
             description = """
-                    Retourne la liste complète de toutes les races enregistrées en base.
+                    Retourne la liste complète de toutes les competences enregistrées en base.
                     Aucun paramètre requis.
-                    Retourne un tableau vide si aucune race n'existe
+                    Retourne un tableau vide si aucune competence n'existe
                     """
     )
     @ApiResponses(value = {
@@ -52,49 +48,49 @@ public class RaceController {
                     description = "Liste retournée avec succès"
             )
     })
-    @JsonView(RaceView.class)
-    public List<Race> getAllRaces() {
-        return raceDao.findAll();
+    @JsonView(CompetenceView.class)
+    public List<Competence> getAllCompetences() {
+        return competenceDao.findAll();
     }
 
     @GetMapping("/{id}")
     @Operation(
-            summary = "Récuperer une race par son ID",
+            summary = "Récuperer une competence par son ID",
             description = """
-                    Retourne les détails d'une race à partir de son identifiant unique passé en paramètre de chemin (path variable).
+                    Retourne les détails d'une competence à partir de son identifiant unique passé en paramètre de chemin (path variable).
                     Retourne une erreur 404 si l'ID est introuvable en base.
                     """
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Race trouvée et retournée avec succès"
+                    description = "Competence trouvée et retournée avec succès"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Aucune race ne correspond à cet ID"
+                    description = "Aucune competence ne correspond à cet ID"
             )
     })
-    @JsonView(RaceView.class)
-    public ResponseEntity<Race> get(
-            @Parameter(description = "Identifiant unique de la race", required = true, example = "1")
+    @JsonView(CompetenceView.class)
+    public ResponseEntity<Competence> get(
+            @Parameter(description = "Identifiant unique sur la competence", required = true, example = "1")
             @PathVariable Integer id
     ) {
 
-        Optional<Race> optionalRace = raceDao.findById(id);
+        Optional<Competence> optionalCompetence = competenceDao.findById(id);
 
-        if(optionalRace.isEmpty()) {
+        if (optionalCompetence.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(optionalRace.get(), HttpStatus.OK);
+        return new ResponseEntity<>(optionalCompetence.get(), HttpStatus.OK);
     }
 
     @PostMapping
     @Operation(
-            summary = "Créer une nouvelle race",
+            summary = "Créer une nouvelle competence",
             description = """
-                    Crée une nouvelle race à partir du corps de la requête au format JSON.
+                    Crée une nouvelle competence à partir du corps de la requête au format JSON.
                     L'ID fourni dans le corps est ignoré : il sera généré automatiquement par la base (autoincrémenté).
                     Les champs obligatoire sont validés via @Valid.
                     """
@@ -102,69 +98,69 @@ public class RaceController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201",
-                    description = "Race crée avec succès"
+                    description = "Competence créée avec succès"
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Corps de la requête invalide ou champs manquants"
             )
     })
-    @JsonView(RaceView.class)
-    public ResponseEntity<Race> createRace(
+    @JsonView(CompetenceView.class)
+    public ResponseEntity<Competence> createCompetence(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Objet Race à créer. L'ID sera ignoré."
+                    description = "Objet competence à créer. L'ID sera ignoré"
             )
             @RequestBody
-            @Valid Race raceToInsert
+            @Valid Competence competenceToInsert
     ) {
 
-        raceToInsert.setId(null);
+        competenceToInsert.setId(null);
 
-        raceDao.save(raceToInsert);
+        competenceDao.save(competenceToInsert);
 
-        return new ResponseEntity<>(raceToInsert, HttpStatus.CREATED);
+        return new ResponseEntity<>(competenceToInsert, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     @Operation(
-            summary = "Supprimer une race par son ID",
+            summary = "Supprimer une competence par son ID",
             description = """
-                    Supprime définitivement la race correspondant à l'ID passé en path variable.
-                    Retourne une erreur 404 s i l'ID est introuvable en base.
+                    Supprime définitivement la competence correspondante à l'ID passé en path variable.
+                    Retourne une erreur 404 si l'ID est introuvable en base.
                     Retourne un statut 204 sans corps de réponse si la suppression est réussie.                    
                     """
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "204",
-                    description = "Race supprimée avec succès, aucun contenu retourné"
+                    description = "Competence supprimée avec succès, aucun contenu retourné"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Aucune race ne correspond à cet ID"
+                    description = "Aucune competence ne correspond à cet ID"
             )
     })
-    public ResponseEntity<Race> deleteRace(
-            @Parameter(description = "Identifiant unique de la race à supprimer", required = true, example = "1")
+    public ResponseEntity<Competence> deleteCompetence(
+            @Parameter(description = "Identifiant unique de la competence a supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
 
-        Optional<Race> optionalRace = raceDao.findById(id);
+        Optional<Competence> optionalCompetence = competenceDao.findById(id);
 
-        if(optionalRace.isEmpty()) {
+        if (optionalCompetence.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        raceDao.deleteById(id);
+        competenceDao.deleteById(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
     @Operation(
-            summary = "Mettre à jour une race existante",
+            summary = "Mettre à jour une competence existante",
             description = """
-                    Met à jour les informations d'une race existante identifée par son ID.
+                    Met à jour les informations d'une competence existante identifiée par son ID.
                     L'ID du corps JSON est écrasé par celui de l'URL pour éviter toute incohérence.
                     Retourne une erreur 404 si l'ID est introuvable en base.
                     Retourne un statut 204 sans corps de réponse si la mise à jour est réussie.
@@ -173,40 +169,38 @@ public class RaceController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "204",
-                    description = "Race mise à jour avec succès, aucun contenu retourné"
+                    description = "Competence mise à jour avec succès, aucun contenu retourné"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Aucune race ne correspond à cet ID"
+                    description = "Aucune competence ne correspond à cet ID"
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Corps de la requête invalide ou champs manquants"
             )
     })
-    public ResponseEntity<Void> updateRace(
-            @Parameter(description = "Identifiant unique de la race à mettre à jour", required = true, example = "1")
+    public ResponseEntity<Void> updateCompetence(
+            @Parameter(description = "Identifiant unique de la competence à mettre à jour", required = true, example = "1")
             @PathVariable Integer id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Objet Race avec les nouvelles valeurs. L'ID sera écrasé par celui de l'URL.",
+                    description = "Objet Competence avec les nouvelles valeurs. L'ID sera écrasé par celui de l'URL",
                     required = true
             )
             @RequestBody
             @Validated(ValidationGroupe.OnUpdate.class)
-            Race raceToUpdate) {
+            Competence competenceToUpdate
+    ) {
+        Optional<Competence> optionalCompetence = competenceDao.findById(id);
 
-        Optional<Race> optionalRace = raceDao.findById(id);
-
-        if(optionalRace.isEmpty()) {
+        if (optionalCompetence.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        // On écrase l'id du json par celui en paramètre
-        raceToUpdate.setId(id);
+        competenceToUpdate.setId(id);
 
-        raceDao.save(raceToUpdate);
+        competenceDao.save(competenceToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
 }
