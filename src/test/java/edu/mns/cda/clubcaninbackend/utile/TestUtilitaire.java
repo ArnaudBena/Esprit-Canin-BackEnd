@@ -13,7 +13,7 @@ import java.util.Set;
 public class TestUtilitaire {
 
     public static boolean constraintViolationExist(
-            Set<ConstraintViolation<Object>> constraintViolations,
+            Set<? extends ConstraintViolation<?>> constraintViolations,
             String fieldName,
             String annotationName
     ) {
