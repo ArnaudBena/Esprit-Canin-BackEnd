@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -96,7 +95,7 @@ public class RaceController {
             description = """
                     Crée une nouvelle race à partir du corps de la requête au format JSON.
                     L'ID fourni dans le corps est ignoré : il sera généré automatiquement par la base (autoincrémenté).
-                    Les champs obligatoire sont validés via @Valid.
+                    Les champs obligatoires sont validés via @Valid.
                     """
     )
     @ApiResponses(value = {
@@ -115,7 +114,7 @@ public class RaceController {
                     description = "Objet Race à créer. L'ID sera ignoré."
             )
             @RequestBody
-            @Valid Race raceToInsert
+            @Validated(ValidationGroupe.OnCreate.class) Race raceToInsert
     ) {
 
         raceToInsert.setId(null);

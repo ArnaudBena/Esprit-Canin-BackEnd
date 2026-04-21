@@ -1,10 +1,10 @@
 package edu.mns.cda.clubcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.clubcaninbackend.dao.RoleDao;
-import edu.mns.cda.clubcaninbackend.model.Role;
+import edu.mns.cda.clubcaninbackend.dao.UtilisateurDao;
+import edu.mns.cda.clubcaninbackend.model.Utilisateur;
 import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
-import edu.mns.cda.clubcaninbackend.view.RoleView;
+import edu.mns.cda.clubcaninbackend.view.UtilisateurView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,25 +20,25 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@Tag(name = "Role", description = """
-        API de gestion des roles du club canin.
-        Permet de récupérer, créer, modifier et supprimer des roles.
+@Tag(name = "Utilisateur", description = """
+        API de gestion des utilisateurs du club canin.
+        Permet de récupérer, créer, modifier et supprimer des utilisateurs.
         Toutes les réponses sont au format JSON.        
         """)
 @RequiredArgsConstructor
-@RequestMapping("/role")
+@RequestMapping("/utilisateur")
 @CrossOrigin
-public class RoleController {
+public class UtilisateurController {
 
-    protected final RoleDao roleDao;
+    protected final UtilisateurDao utilisateurDao;
 
     @GetMapping("/list")
     @Operation(
-            summary = "Lister tous les roles",
+            summary = "Lister tous les utilisateurs",
             description = """
-                    Retourne la liste complète de tous les roles enregistrés en base.
+                    Retourne la liste complète de tous les utilisateurs enregistrés en base.
                     Aucun paramètre requis.
-                    Retourne un tableau vide si aucun role n'existe
+                    Retourne un tableau vide si aucun utilisateur n'existe
                     """
     )
     @ApiResponses(value = {
@@ -47,84 +47,84 @@ public class RoleController {
                     description = "Liste retournée avec succès"
             )
     })
-    @JsonView(RoleView.class)
-    public List<Role> getAllRoles() {
-        return roleDao.findAll();
+    @JsonView(UtilisateurView.class)
+    public List<Utilisateur> getAllUtilisateurs() {
+        return utilisateurDao.findAll();
     }
 
     @GetMapping("/{id}")
     @Operation(
-            summary = "Récuperer un role par son ID",
+            summary = "Récuperer un utilisateur par son ID",
             description = """
-                    Retourne les détails d'un role à partir de son identifiant unique passé en paramètre de chemin (path variable).
+                    Retourne les détails d'un utilisateur à partir de son identifiant unique passé en paramètre de chemin (path variable).
                     Retourne une erreur 404 si l'ID est introuvable en base.
                     """
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Role trouvé et retourné avec succès"
+                    description = "Utilisateur trouvé et retourné avec succès"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Aucun role ne correspond à cet ID"
+                    description = "Aucun utilisateur ne correspond à cet ID"
             )
     })
-    @JsonView(RoleView.class)
-    public ResponseEntity<Role> get(
-            @Parameter(description = "Identifiant unique sur le role", required = true, example = "1")
+    @JsonView(UtilisateurView.class)
+    public ResponseEntity<Utilisateur> get(
+            @Parameter(description = "Identifiant unique de l'utilisateur", required = true, example = "1")
             @PathVariable Integer id
     ) {
 
-        Optional<Role> optionalRole = roleDao.findById(id);
+        Optional<Utilisateur> optionalUtilisateur = utilisateurDao.findById(id);
 
-        if (optionalRole.isEmpty()) {
+        if (optionalUtilisateur.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(optionalRole.get(), HttpStatus.OK);
+        return new ResponseEntity<>(optionalUtilisateur.get(), HttpStatus.OK);
     }
 
     @PostMapping
     @Operation(
-            summary = "Créer un nouveau role",
+            summary = "Créer un nouvel utilisateur",
             description = """
-                    Crée un nouveau role à partir du corps de la requête au format JSON.
+                    Crée un nouvel utilisateur à partir du corps de la requête au format JSON.
                     L'ID fourni dans le corps est ignoré : il sera généré automatiquement par la base (autoincrémenté).
-                    Les champs obligatoires sont validés via @Valid.
+                    Les champs obligatoires sont validés via @Validated (groupe OnCreate).
                     """
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201",
-                    description = "Role crée avec succès"
+                    description = "Utilisateur crée avec succès"
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Corps de la requête invalide ou champs manquants"
             )
     })
-    @JsonView(RoleView.class)
-    public ResponseEntity<Role> createRole(
+    @JsonView(UtilisateurView.class)
+    public ResponseEntity<Utilisateur> createUtilisateur(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Objet role à créer. L'ID sera ignoré"
+                    description = "Objet utilisateur à créer. L'ID sera ignoré"
             )
             @RequestBody
-            @Validated(ValidationGroupe.OnCreate.class) Role roleToInsert
+            @Validated(ValidationGroupe.OnCreate.class) Utilisateur utilisateurToInsert
     ) {
 
-        roleToInsert.setId(null);
+        utilisateurToInsert.setId(null);
 
-        roleDao.save(roleToInsert);
+        utilisateurDao.save(utilisateurToInsert);
 
-        return new ResponseEntity<>(roleToInsert, HttpStatus.CREATED);
+        return new ResponseEntity<>(utilisateurToInsert, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     @Operation(
-            summary = "Supprimer un role par son ID",
+            summary = "Supprimer un utilisateur par son ID",
             description = """
-                    Supprime définitivement le role correspondant à l'ID passé en path variable.
+                    Supprime définitivement l'utilisateur correspondant à l'ID passé en path variable.
                     Retourne une erreur 404 si l'ID est introuvable en base.
                     Retourne un statut 204 sans corps de réponse si la suppression est réussie.                    
                     """
@@ -132,34 +132,34 @@ public class RoleController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "204",
-                    description = "Role supprimé avec succès, aucun contenu retourné"
+                    description = "Utilisateur supprimé avec succès, aucun contenu retourné"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Aucun role ne correspond à cet ID"
+                    description = "Aucun utilisateur ne correspond à cet ID"
             )
     })
-    public ResponseEntity<Role> deleteRole(
-            @Parameter(description = "Identifiant unique du role a supprimer", required = true, example = "1")
+    public ResponseEntity<Utilisateur> deleteUtilisateur(
+            @Parameter(description = "Identifiant unique de l'utilisateur a supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
 
-        Optional<Role> optionalRole = roleDao.findById(id);
+        Optional<Utilisateur> optionalUtilisateur = utilisateurDao.findById(id);
 
-        if (optionalRole.isEmpty()) {
+        if (optionalUtilisateur.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        roleDao.deleteById(id);
+        utilisateurDao.deleteById(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping("/{id}")
     @Operation(
-            summary = "Mettre à jour un role existant",
+            summary = "Mettre à jour un utilisateur existant",
             description = """
-                    Met à jour les informations d'un role existant identifié par son ID.
+                    Met à jour les informations d'un utilisateur existant identifié par son ID.
                     L'ID du corps JSON est écrasé par celui de l'URL pour éviter toute incohérence.
                     Retourne une erreur 404 si l'ID est introuvable en base.
                     Retourne un statut 204 sans corps de réponse si la mise à jour est réussie.
@@ -168,37 +168,37 @@ public class RoleController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "204",
-                    description = "Role mis à jour avec succès, aucun contenu retourné"
+                    description = "Utilisateur mis à jour avec succès, aucun contenu retourné"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Aucun role ne correspond à cet ID"
+                    description = "Aucun utilisateur ne correspond à cet ID"
             ),
             @ApiResponse(
                     responseCode = "400",
                     description = "Corps de la requête invalide ou champs manquants"
             )
     })
-    public ResponseEntity<Void> updateRole(
-            @Parameter(description = "Identifiant unique du role à mettre à jour", required = true, example = "1")
+    public ResponseEntity<Void> updateUtilisateur(
+            @Parameter(description = "Identifiant unique de l'utilisateur à mettre à jour", required = true, example = "1")
             @PathVariable Integer id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Objet Role avec les nouvelles valeurs. L'ID sera écrasé par celui de l'URL",
+                    description = "Objet Utilisateur avec les nouvelles valeurs. L'ID sera écrasé par celui de l'URL",
                     required = true
             )
             @RequestBody
             @Validated(ValidationGroupe.OnUpdate.class)
-            Role roleToUpdate
+            Utilisateur utilisateurToUpdate
     ) {
-        Optional<Role> optionalRole = roleDao.findById(id);
+        Optional<Utilisateur> optionalUtilisateur = utilisateurDao.findById(id);
 
-        if (optionalRole.isEmpty()) {
+        if (optionalUtilisateur.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        roleToUpdate.setId(id);
+        utilisateurToUpdate.setId(id);
 
-        roleDao.save(roleToUpdate);
+        utilisateurDao.save(utilisateurToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

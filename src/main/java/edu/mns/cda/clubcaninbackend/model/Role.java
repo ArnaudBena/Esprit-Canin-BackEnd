@@ -1,6 +1,7 @@
 package edu.mns.cda.clubcaninbackend.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.clubcaninbackend.view.RoleView;
 import edu.mns.cda.clubcaninbackend.view.UtilisateurView;
 import jakarta.persistence.*;
@@ -24,9 +25,9 @@ public class Role {
     @JsonView({UtilisateurView.class, RoleView.class})
     protected Integer id;
 
-    @NotBlank
-    @Column(length = 30,nullable = false, unique = true)
-    @Length(min = 3, max = 30)
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
+    @Column(length = 30, nullable = false, unique = true)
+    @Length(min = 3, max = 30, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @JsonView({UtilisateurView.class, RoleView.class})
     protected String nom;
 

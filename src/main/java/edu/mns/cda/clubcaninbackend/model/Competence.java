@@ -1,6 +1,7 @@
 package edu.mns.cda.clubcaninbackend.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.clubcaninbackend.view.ChienView;
 import edu.mns.cda.clubcaninbackend.view.CompetenceView;
 import jakarta.persistence.*;
@@ -25,9 +26,9 @@ public class Competence {
     @JsonView({ChienView.class, CompetenceView.class})
     protected Integer id;
 
-    @NotBlank
-    @Column(length = 50,nullable = false, unique = true)
-    @Length(min = 3, max = 50)
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
+    @Column(length = 50, nullable = false, unique = true)
+    @Length(min = 3, max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @JsonView({ChienView.class, CompetenceView.class})
     protected String nom;
 

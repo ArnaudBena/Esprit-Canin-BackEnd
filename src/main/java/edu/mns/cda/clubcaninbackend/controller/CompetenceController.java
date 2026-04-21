@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,7 +91,7 @@ public class CompetenceController {
             description = """
                     Crée une nouvelle competence à partir du corps de la requête au format JSON.
                     L'ID fourni dans le corps est ignoré : il sera généré automatiquement par la base (autoincrémenté).
-                    Les champs obligatoire sont validés via @Valid.
+                    Les champs obligatoires sont validés via @Valid.
                     """
     )
     @ApiResponses(value = {
@@ -111,7 +110,7 @@ public class CompetenceController {
                     description = "Objet competence à créer. L'ID sera ignoré"
             )
             @RequestBody
-            @Valid Competence competenceToInsert
+            @Validated(ValidationGroupe.OnCreate.class) Competence competenceToInsert
     ) {
 
         competenceToInsert.setId(null);

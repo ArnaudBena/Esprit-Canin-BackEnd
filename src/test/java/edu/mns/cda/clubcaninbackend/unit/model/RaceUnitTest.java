@@ -3,6 +3,7 @@ package edu.mns.cda.clubcaninbackend.unit.model;
 
 import edu.mns.cda.clubcaninbackend.model.Race;
 import edu.mns.cda.clubcaninbackend.utile.TestUtilitaire;
+import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -28,7 +29,7 @@ public class RaceUnitTest {
         Race race = new Race();
         race.setNom("");
 
-        Set<ConstraintViolation<Race>> violations = validator.validate(race);
+        Set<ConstraintViolation<Race>> violations = validator.validate(race, ValidationGroupe.OnCreate.class);
 
         boolean erreurExiste = violations.stream().anyMatch(contrainte -> {
             String champs = contrainte.getPropertyPath().toString();
@@ -46,7 +47,7 @@ public class RaceUnitTest {
         Race race = new Race();
         race.setNom("ab");
 
-        Set<ConstraintViolation<Race>> violations = validator.validate(race);
+        Set<ConstraintViolation<Race>> violations = validator.validate(race, ValidationGroupe.OnCreate.class);
 
         boolean erreurExiste = TestUtilitaire.constraintViolationExist(
                 violations,
@@ -63,7 +64,7 @@ public class RaceUnitTest {
         Race race = new Race();
         race.setNom("a".repeat(51));
 
-        Set<ConstraintViolation<Race>> violations = validator.validate(race);
+        Set<ConstraintViolation<Race>> violations = validator.validate(race, ValidationGroupe.OnCreate.class);
 
         boolean erreurExiste = TestUtilitaire.constraintViolationExist(
                 violations,
@@ -80,7 +81,7 @@ public class RaceUnitTest {
         Race race = new Race();
         race.setNom("Berger Malinois");
 
-        Set<ConstraintViolation<Race>> violations = validator.validate(race);
+        Set<ConstraintViolation<Race>> violations = validator.validate(race, ValidationGroupe.OnCreate.class);
 
         Assertions.assertTrue(violations.isEmpty(),
             "La race aurait dû être valide mais des violations ont été détectées");

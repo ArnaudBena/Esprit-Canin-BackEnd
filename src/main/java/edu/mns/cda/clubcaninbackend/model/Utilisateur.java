@@ -26,41 +26,41 @@ public class Utilisateur {
     @JsonView(UtilisateurView.class)
     protected Integer id;
 
-    @NotBlank
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false, length = 50)
     @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @JsonView(UtilisateurView.class)
     protected String nom;
 
-    @NotBlank
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false, length = 50)
     @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @JsonView(UtilisateurView.class)
     protected String prenom;
 
-    @NotBlank
-    @Email
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
+    @Email(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false, unique = true, length = 100)
     @Size(max = 100, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @JsonView(UtilisateurView.class)
     protected String email;
 
-    @NotBlank
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
     @Size(min = 8, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le mot de passe ne peut pas faire moins de 8 caractères")
     protected String password;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @CreatedDate
     @Column(nullable = false, updatable = false)
     @JsonView(UtilisateurView.class)
     protected LocalDate dateInscription;
 
-    @Size(max = 20, message = "Le numéro de téléphone est trop long")
+    @Size(max = 20, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le numéro de téléphone est trop long")
     @JsonView(UtilisateurView.class)
     protected String telephone;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @JoinColumn(name = "id_role", nullable = false)
     @JsonView(UtilisateurView.class)

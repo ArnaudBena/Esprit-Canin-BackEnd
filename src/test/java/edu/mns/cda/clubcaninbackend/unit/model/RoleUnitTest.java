@@ -2,6 +2,7 @@ package edu.mns.cda.clubcaninbackend.unit.model;
 
 import edu.mns.cda.clubcaninbackend.model.Role;
 import edu.mns.cda.clubcaninbackend.utile.TestUtilitaire;
+import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -27,7 +28,7 @@ public class RoleUnitTest {
         Role role = new Role();
         role.setNom("");
 
-        Set<ConstraintViolation<Role>> violations = validator.validate(role);
+        Set<ConstraintViolation<Role>> violations = validator.validate(role, ValidationGroupe.OnCreate.class);
 
         boolean erreurExiste = violations.stream().anyMatch(contrainte -> {
             String champs = contrainte.getPropertyPath().toString();
@@ -45,7 +46,7 @@ public class RoleUnitTest {
         Role role = new Role();
         role.setNom("ab");
 
-        Set<ConstraintViolation<Role>> violations = validator.validate(role);
+        Set<ConstraintViolation<Role>> violations = validator.validate(role, ValidationGroupe.OnCreate.class);
 
         boolean erreurExiste = TestUtilitaire.constraintViolationExist(
                 violations,
@@ -62,7 +63,7 @@ public class RoleUnitTest {
         Role role = new Role();
         role.setNom("a".repeat(31));
 
-        Set<ConstraintViolation<Role>> violations = validator.validate(role);
+        Set<ConstraintViolation<Role>> violations = validator.validate(role, ValidationGroupe.OnCreate.class);
 
         boolean erreurExiste = TestUtilitaire.constraintViolationExist(
                 violations,
@@ -79,7 +80,7 @@ public class RoleUnitTest {
         Role role = new Role();
         role.setNom("Coach");
 
-        Set<ConstraintViolation<Role>> violations = validator.validate(role);
+        Set<ConstraintViolation<Role>> violations = validator.validate(role, ValidationGroupe.OnCreate.class);
 
         Assertions.assertTrue(violations.isEmpty(),
                 "Le rôle aurait dû être valide mais des violations ont été détectées");
