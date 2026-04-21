@@ -1,7 +1,6 @@
 package edu.mns.cda.clubcaninbackend.unit.model;
 
-
-import edu.mns.cda.clubcaninbackend.model.Race;
+import edu.mns.cda.clubcaninbackend.model.Role;
 import edu.mns.cda.clubcaninbackend.utile.TestUtilitaire;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -13,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
-public class RaceUnitTest {
+public class RoleUnitTest {
 
     protected static Validator validator;
 
@@ -23,12 +22,12 @@ public class RaceUnitTest {
     }
 
     @Test
-    @DisplayName("Une race avec un nom vide doit échouer la validation (@NotBlank)")
-    public void validRaceWithBlankNom_shouldNotBeValid() {
-        Race race = new Race();
-        race.setNom("");
+    @DisplayName("Un rôle avec un nom vide doit échouer la validation (@NotBlank)")
+    public void validRoleWithBlankNom_shouldNotBeValid() {
+        Role role = new Role();
+        role.setNom("");
 
-        Set<ConstraintViolation<Race>> violations = validator.validate(race);
+        Set<ConstraintViolation<Role>> violations = validator.validate(role);
 
         boolean erreurExiste = violations.stream().anyMatch(contrainte -> {
             String champs = contrainte.getPropertyPath().toString();
@@ -41,12 +40,12 @@ public class RaceUnitTest {
     }
 
     @Test
-    @DisplayName("Une race avec un nom de moins de 3 caractères doit échouer la validation (@Length)")
-    public void validRaceWithNomTooShort_shouldNotBeValid() {
-        Race race = new Race();
-        race.setNom("ab");
+    @DisplayName("Un rôle avec un nom de moins de 3 caractères doit échouer la validation (@Length)")
+    public void validRoleWithNomTooShort_shouldNotBeValid() {
+        Role role = new Role();
+        role.setNom("ab");
 
-        Set<ConstraintViolation<Race>> violations = validator.validate(race);
+        Set<ConstraintViolation<Role>> violations = validator.validate(role);
 
         boolean erreurExiste = TestUtilitaire.constraintViolationExist(
                 violations,
@@ -58,12 +57,12 @@ public class RaceUnitTest {
     }
 
     @Test
-    @DisplayName("Une race avec un nom de plus de 50 caractères doit échouer la validation (@Length)")
-    public void validRaceWithNomTooLong_shouldNotBeValid() {
-        Race race = new Race();
-        race.setNom("a".repeat(51));
+    @DisplayName("Un rôle avec un nom de plus de 30 caractères doit échouer la validation (@Length)")
+    public void validRoleWithNomTooLong_shouldNotBeValid() {
+        Role role = new Role();
+        role.setNom("a".repeat(31));
 
-        Set<ConstraintViolation<Race>> violations = validator.validate(race);
+        Set<ConstraintViolation<Role>> violations = validator.validate(role);
 
         boolean erreurExiste = TestUtilitaire.constraintViolationExist(
                 violations,
@@ -71,18 +70,18 @@ public class RaceUnitTest {
                 "Length"
         );
 
-        Assertions.assertTrue(erreurExiste, "La contrainte @Length(max=50) sur nom n'a pas fonctionné");
+        Assertions.assertTrue(erreurExiste, "La contrainte @Length(max=30) sur nom n'a pas fonctionné");
     }
 
     @Test
-    @DisplayName("Une race avec un nom valide doit passer la validation")
-    public void validRaceWithNomValide_shouldBeValid() {
-        Race race = new Race();
-        race.setNom("Berger Malinois");
+    @DisplayName("Un role avec un nom valide doit passer la validation")
+    public void validRoleWithNomValide_shouldBeValid() {
+        Role role = new Role();
+        role.setNom("Coach");
 
-        Set<ConstraintViolation<Race>> violations = validator.validate(race);
+        Set<ConstraintViolation<Role>> violations = validator.validate(role);
 
         Assertions.assertTrue(violations.isEmpty(),
-            "La race aurait dû être valide mais des violations on été détectées");
+                "Le rôle aurait dû être valide mais des violations ont été détectées");
     }
 }
