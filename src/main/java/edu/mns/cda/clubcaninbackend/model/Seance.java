@@ -28,38 +28,38 @@ public class Seance {
     @JsonView(SeanceView.class)
     protected Integer id;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @FutureOrPresent(groups = ValidationGroupe.OnCreate.class)
     @Column(nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
     @JsonView(SeanceView.class)
     protected LocalDate date;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
     @JsonFormat(pattern = "HH:mm:ss")
     @JsonView(SeanceView.class)
     protected LocalTime heureDebut;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
-    @Min(value = 1, message = "La durée doit être positive")
+    @Min(value = 1, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "La durée doit être positive")
     @JsonView(SeanceView.class)
     protected Integer dureeMinutes;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @JsonView(SeanceView.class)
     protected StatutSeance statut;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @JoinColumn(name = "id_type_seance", nullable = false)
     @JsonView(SeanceView.class)
     protected TypeSeance typeSeance;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @JoinColumn(name = "id_coach", nullable = false)
     @JsonView(SeanceView.class)

@@ -1,6 +1,7 @@
 package edu.mns.cda.clubcaninbackend.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.clubcaninbackend.view.CompetenceView;
 import edu.mns.cda.clubcaninbackend.view.TypeSeanceView;
 import jakarta.persistence.*;
@@ -36,21 +37,21 @@ public class TypeSeanceCompetenceConferee {
     @EmbeddedId
     protected Key id;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @MapsId("typeSeanceId")
     @JoinColumn(name = "id_type_seance")
     @JsonView(CompetenceView.class)
     protected TypeSeance typeSeance;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @MapsId("competenceId")
     @JoinColumn(name = "id_competence")
     @JsonView(TypeSeanceView.class)
     protected Competence competence;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @JsonView({TypeSeanceView.class, CompetenceView.class})

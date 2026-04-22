@@ -91,7 +91,7 @@ public class RoleController {
             description = """
                     Crée un nouveau role à partir du corps de la requête au format JSON.
                     L'ID fourni dans le corps est ignoré : il sera généré automatiquement par la base (autoincrémenté).
-                    Les champs obligatoires sont validés via @Valid.
+                    Les champs obligatoires sont validés via @Validated (groupe OnCreate).
                     """
     )
     @ApiResponses(value = {

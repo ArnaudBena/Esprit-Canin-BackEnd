@@ -46,25 +46,25 @@ public class TypeSeance {
     @JsonView(TypeSeanceView.class)
     protected Integer ageMaximum;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
     @Min(value = 30,groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "La durée minimale ne peut pas être inférieure à 30 mins")
     @JsonView(TypeSeanceView.class)
     protected Integer dureeMinimale;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
     @Max(value = 240, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "La durée maximale ne peut pas être supérieure à 4h")
     @JsonView(TypeSeanceView.class)
     protected Integer dureeMaximale;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
     @Min(value = 1, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le nombre de participants minimum ne peut pas être inférieur à 1")
     @JsonView({TypeSeanceView.class, SeanceView.class})
     protected Integer participantsMinimum;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
     @Max(value = 10, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le nombre de participants maximum ne peut pas être supérieur à 10")
     @JsonView(TypeSeanceView.class)

@@ -2,6 +2,7 @@ package edu.mns.cda.clubcaninbackend.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.clubcaninbackend.view.ChienView;
 import edu.mns.cda.clubcaninbackend.view.CompetenceView;
 import jakarta.persistence.*;
@@ -40,26 +41,26 @@ public class ChienCompetence {
     @EmbeddedId
     protected Key id;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @MapsId("chienId")
     @JoinColumn(name = "id_chien")
     protected Chien chien;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @MapsId("competenceId")
     @JoinColumn(name = "id_competence")
     @JsonView({ChienView.class, CompetenceView.class})
     protected Competence competence;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @JsonView({ChienView.class, CompetenceView.class})
     protected NiveauCompetence niveauActuel;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false)
     @JsonView({ChienView.class, CompetenceView.class})

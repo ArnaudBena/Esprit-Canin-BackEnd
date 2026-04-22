@@ -31,43 +31,43 @@ public class Chien {
     @JsonView({ChienView.class, SeanceView.class})
     protected String nom;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
-    @Positive(message = "Le poids doit être positif")
+    @Positive(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le poids doit être positif")
     @JsonView({ChienView.class, SeanceView.class})
     protected Double poids;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
-    @Positive(message = "La taille doit être positive")
+    @Positive(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "La taille doit être positive")
     @JsonView({ChienView.class, SeanceView.class})
     protected Double taille;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @JsonView(ChienView.class)
     protected Sexe sexe;
 
-    @NotNull
-    @PastOrPresent
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
+    @PastOrPresent(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false, updatable = false)
     @JsonView(ChienView.class)
     protected LocalDate dateNaissance;
 
     @Column(unique = true, length = 30)
-    @Size(max = 30, message = "Le numéro de puce ne peut pas depasser 30 caractères")
+    @Size(max = 30, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le numéro de puce ne peut pas depasser 30 caractères")
     @JsonView(ChienView.class)
     protected String numeroPuce;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @JoinColumn(name = "id_utilisateur", nullable = false)
     @JsonView(ChienView.class)
     protected Utilisateur utilisateur;
 
-    @NotNull
+    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @JoinColumn(name = "id_race", nullable = false)
     @JsonView(ChienView.class)
