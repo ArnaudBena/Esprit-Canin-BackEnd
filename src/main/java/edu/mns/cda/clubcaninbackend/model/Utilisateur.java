@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.clubcaninbackend.view.ChienView;
+import edu.mns.cda.clubcaninbackend.view.SeanceView;
 import edu.mns.cda.clubcaninbackend.view.UtilisateurView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -24,19 +25,19 @@ import java.util.List;
 public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView({UtilisateurView.class, ChienView.class})
+    @JsonView({UtilisateurView.class, ChienView.class, SeanceView.class})
     protected Integer id;
 
     @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false, length = 50)
     @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
-    @JsonView({UtilisateurView.class,ChienView.class})
+    @JsonView({UtilisateurView.class,ChienView.class, SeanceView.class})
     protected String nom;
 
     @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false, length = 50)
     @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
-    @JsonView({UtilisateurView.class,ChienView.class})
+    @JsonView({UtilisateurView.class,ChienView.class, SeanceView.class})
     protected String prenom;
 
     @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})

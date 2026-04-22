@@ -34,15 +34,15 @@ public class TypeSeance {
     protected String libelle;
 
     @Column(columnDefinition = "TEXT")
-    @JsonView(TypeSeanceView.class)
+    @JsonView({TypeSeanceView.class,SeanceView.class})
     protected String description;
 
     @Min(value = 0, message = "L'âge minimum ne peut pas être négatif")
-    @JsonView(TypeSeanceView.class)
+    @JsonView({TypeSeanceView.class,SeanceView.class})
     protected Integer ageMinimum;
 
     @Max(value = 30, message = "L'âge maximum ne peut pas dépasser 30 ans")
-    @JsonView(TypeSeanceView.class)
+    @JsonView({TypeSeanceView.class,SeanceView.class})
     protected Integer ageMaximum;
 
     @NotNull
@@ -60,13 +60,13 @@ public class TypeSeance {
     @NotNull
     @Column(nullable = false)
     @Min(value = 1, message = "Le nombre de participants minimum ne peut pas être inférieur à 1")
-    @JsonView({TypeSeanceView.class, SeanceView.class})
+    @JsonView(TypeSeanceView.class)
     protected Integer participantsMinimum;
 
     @NotNull
     @Column(nullable = false)
     @Max(value = 10, message = "Le nombre de participants maximum ne peut pas être supérieur à 10")
-    @JsonView(TypeSeanceView.class)
+    @JsonView({TypeSeanceView.class,SeanceView.class})
     protected Integer participantsMaximum;
 
     @OneToMany(mappedBy = "typeSeance")

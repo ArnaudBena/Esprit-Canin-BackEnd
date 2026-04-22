@@ -17,19 +17,16 @@ INSERT INTO competence (nom, description) VALUES
     - Débutant : Assis, Couché sur commande au calme, à courte distance.
     - Intermédiaire : ajoute Rappel fiable, Marche en laisse sans tirer, Pas bouger court.
     - Confirmé : maîtrise de l''ensemble avec distractions et à distance, ordres à la voix et au geste.'),
-
     ('Agilité',
     'Discipline sportive de franchissement et de maniabilité.
     - Débutant : Saut obstacle bas, Tunnel droit, Table (arrêt 5s).
     - Intermédiaire : Slalom 6 piquets, Passerelle, Balançoire assistée, Pneu.
     - Confirmé : Parcours complet enchaîné, slalom 12 piquets, gestion du rythme et des refus.'),
-
     ('Pistage',
     'Travail olfactif et recherche.
     - Débutant : Recherche d''objet familier à courte distance, piste fraîche simple.
     - Intermédiaire : Piste vieillie 15-30 min avec changements de direction, objets intermédiaires.
     - Confirmé : Piste vieillie 1h+, terrain varié, distracteurs olfactifs, identification d''articles.'),
-
     ('Sociabilisation',
     'Comportement en environnement varié.
     - Débutant : Calme en présence d''autres chiens tenus en laisse, tolère les inconnus à distance.
@@ -55,15 +52,18 @@ INSERT INTO type_seance (libelle, description, age_minimum, age_maximum, duree_m
     ('Obéissance débutant',
     'Séance d''initiation aux commandes de base (assis, couché, pas bouger) en environnement calme. Idéale pour les jeunes chiens et les chiens jamais éduqués.',
     0, 2, 45, 60, 2, 6),
-
     ('Agilité intermédiaire',
     'Parcours d''obstacles comprenant slalom 6 piquets, passerelle, pneu et balançoire assistée. Le chien doit déjà maîtriser les bases de l''agilité.',
     1, 10, 60, 90, 3, 8),
-
     ('Pistage débutant',
     'Introduction au travail olfactif : recherche d''objets familiers sur piste courte et fraîche. Développe la concentration et l''indépendance du chien.',
     1, 10, 60, 120, 2, 5),
-
     ('Sociabilisation chiots',
     'Rencontres encadrées entre jeunes chiens pour apprendre les codes canins et développer un comportement équilibré en groupe.',
     0, 1, 30, 45, 4, 10);
+
+-- Séances
+INSERT INTO seance (date, heure_debut, duree_minutes, statut, id_type_seance, id_coach) VALUES
+    ('2026-05-10', '10:00:00', 60, 'DISPONIBLE', 1, 3),
+    ('2026-05-15', '14:00:00', 90, 'DISPONIBLE', 2, 3),
+    ('2026-05-20', '09:30:00', 60, 'DISPONIBLE', 3, 3);
