@@ -2,7 +2,6 @@ package edu.mns.cda.clubcaninbackend.unit.model;
 
 import edu.mns.cda.clubcaninbackend.model.Competence;
 import edu.mns.cda.clubcaninbackend.utile.TestUtilitaire;
-import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -28,7 +27,7 @@ public class CompetenceUnitTest {
         Competence competence = new Competence();
         competence.setNom("");
 
-        Set<ConstraintViolation<Competence>> violations = validator.validate(competence, ValidationGroupe.OnCreate.class);
+        Set<ConstraintViolation<Competence>> violations = validator.validate(competence);
 
         boolean erreurExiste = violations.stream().anyMatch(contrainte -> {
             String champs = contrainte.getPropertyPath().toString();
@@ -46,7 +45,7 @@ public class CompetenceUnitTest {
         Competence competence = new Competence();
         competence.setNom("ab");
 
-        Set<ConstraintViolation<Competence>> violations = validator.validate(competence, ValidationGroupe.OnCreate.class);
+        Set<ConstraintViolation<Competence>> violations = validator.validate(competence);
 
         boolean erreurExiste = TestUtilitaire.constraintViolationExist(
                 violations,
@@ -63,7 +62,7 @@ public class CompetenceUnitTest {
         Competence competence = new Competence();
         competence.setNom("a".repeat(51));
 
-        Set<ConstraintViolation<Competence>> violations = validator.validate(competence, ValidationGroupe.OnCreate.class);
+        Set<ConstraintViolation<Competence>> violations = validator.validate(competence);
 
         boolean erreurExiste = TestUtilitaire.constraintViolationExist(
                 violations,
@@ -80,7 +79,7 @@ public class CompetenceUnitTest {
         Competence competence = new Competence();
         competence.setNom("Agilité");
 
-        Set<ConstraintViolation<Competence>> violations = validator.validate(competence, ValidationGroupe.OnCreate.class);
+        Set<ConstraintViolation<Competence>> violations = validator.validate(competence);
 
         Assertions.assertTrue(violations.isEmpty(),
                 "La compétence aurait dû être valide mais " + violations.size() + " violation(s) détectée(s)");

@@ -3,7 +3,6 @@ package edu.mns.cda.clubcaninbackend.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.dao.RoleDao;
 import edu.mns.cda.clubcaninbackend.model.Role;
-import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.clubcaninbackend.view.RoleView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,9 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -91,7 +90,7 @@ public class RoleController {
             description = """
                     Crée un nouveau role à partir du corps de la requête au format JSON.
                     L'ID fourni dans le corps est ignoré : il sera généré automatiquement par la base (autoincrémenté).
-                    Les champs obligatoires sont validés via @Validated (groupe OnCreate).
+                    Les champs obligatoires sont validés via @Valid.
                     """
     )
     @ApiResponses(value = {
@@ -110,7 +109,7 @@ public class RoleController {
                     description = "Objet role à créer. L'ID sera ignoré"
             )
             @RequestBody
-            @Validated(ValidationGroupe.OnCreate.class) Role roleToInsert
+            @Valid Role roleToInsert
     ) {
 
         roleToInsert.setId(null);
@@ -187,7 +186,7 @@ public class RoleController {
                     required = true
             )
             @RequestBody
-            @Validated(ValidationGroupe.OnUpdate.class)
+            @Valid
             Role roleToUpdate
     ) {
         Optional<Role> optionalRole = roleDao.findById(id);

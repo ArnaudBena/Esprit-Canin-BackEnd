@@ -45,9 +45,9 @@ public class Utilisateur {
     @JsonView(UtilisateurView.class)
     protected String email;
 
-    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
+    @NotBlank(groups = ValidationGroupe.OnCreate.class)
     @Column(nullable = false)
-    @Size(min = 8, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le mot de passe ne peut pas faire moins de 8 caractères")
+    @Size(min = 8, groups = ValidationGroupe.OnCreate.class, message = "Le mot de passe ne peut pas faire moins de 8 caractères")
     protected String password;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})

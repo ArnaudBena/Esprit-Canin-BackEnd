@@ -4,7 +4,6 @@ package edu.mns.cda.clubcaninbackend.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.dao.RaceDao;
 import edu.mns.cda.clubcaninbackend.model.Race;
-import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.clubcaninbackend.view.RaceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,10 +13,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -95,7 +94,7 @@ public class RaceController {
             description = """
                     Crée une nouvelle race à partir du corps de la requête au format JSON.
                     L'ID fourni dans le corps est ignoré : il sera généré automatiquement par la base (autoincrémenté).
-                    Les champs obligatoires sont validés via @Validated (groupe OnCreate).
+                    Les champs obligatoires sont validés via @Valid.
                     """
     )
     @ApiResponses(value = {
@@ -114,7 +113,7 @@ public class RaceController {
                     description = "Objet Race à créer. L'ID sera ignoré."
             )
             @RequestBody
-            @Validated(ValidationGroupe.OnCreate.class) Race raceToInsert
+            @Valid Race raceToInsert
     ) {
 
         raceToInsert.setId(null);
@@ -191,7 +190,7 @@ public class RaceController {
                     required = true
             )
             @RequestBody
-            @Validated(ValidationGroupe.OnUpdate.class)
+            @Valid
             Race raceToUpdate) {
 
         Optional<Race> optionalRace = raceDao.findById(id);
