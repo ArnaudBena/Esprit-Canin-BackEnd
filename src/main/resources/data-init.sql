@@ -49,3 +49,21 @@ INSERT INTO chien (nom, poids, taille, sexe, date_naissance, numero_puce, id_uti
     ('Rex', 32.5, 60.0, 'MALE', '2020-05-12', '250269802345678', 1, 1),
     ('Luna', 28.0, 55.0, 'FEMELLE', '2021-08-30', '250269802345679', 1, 2),
     ('Bella', 6.5, 30.0, 'FEMELLE', '2022-03-15', '250269802345680', 2, 3);
+
+-- Types de séance
+INSERT INTO type_seance (libelle, description, age_minimum, age_maximum, duree_minimale, duree_maximale, participants_minimum, participants_maximum) VALUES
+    ('Obéissance débutant',
+    'Séance d''initiation aux commandes de base (assis, couché, pas bouger) en environnement calme. Idéale pour les jeunes chiens et les chiens jamais éduqués.',
+    0, 2, 45, 60, 2, 6),
+
+    ('Agilité intermédiaire',
+    'Parcours d''obstacles comprenant slalom 6 piquets, passerelle, pneu et balançoire assistée. Le chien doit déjà maîtriser les bases de l''agilité.',
+    1, 10, 60, 90, 3, 8),
+
+    ('Pistage débutant',
+    'Introduction au travail olfactif : recherche d''objets familiers sur piste courte et fraîche. Développe la concentration et l''indépendance du chien.',
+    1, 10, 60, 120, 2, 5),
+
+    ('Sociabilisation chiots',
+    'Rencontres encadrées entre jeunes chiens pour apprendre les codes canins et développer un comportement équilibré en groupe.',
+    0, 1, 30, 45, 4, 10);
