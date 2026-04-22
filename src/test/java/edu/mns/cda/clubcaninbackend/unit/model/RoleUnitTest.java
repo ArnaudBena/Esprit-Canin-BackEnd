@@ -83,6 +83,6 @@ public class RoleUnitTest {
         Set<ConstraintViolation<Role>> violations = validator.validate(role, ValidationGroupe.OnCreate.class);
 
         Assertions.assertTrue(violations.isEmpty(),
-                "Le rôle aurait dû être valide mais des violations ont été détectées");
+                "Le rôle aurait dû être valide mais " + violations.size() + " violation(s) détectée(s)");
     }
 }

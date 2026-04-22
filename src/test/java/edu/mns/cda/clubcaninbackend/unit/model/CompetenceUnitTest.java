@@ -83,6 +83,6 @@ public class CompetenceUnitTest {
         Set<ConstraintViolation<Competence>> violations = validator.validate(competence, ValidationGroupe.OnCreate.class);
 
         Assertions.assertTrue(violations.isEmpty(),
-                "La compétence aurait dû être valide mais des violations ont été détectées");
+                "La compétence aurait dû être valide mais " + violations.size() + " violation(s) détectée(s)");
     }
 }

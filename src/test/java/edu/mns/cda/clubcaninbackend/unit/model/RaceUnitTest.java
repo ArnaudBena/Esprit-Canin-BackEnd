@@ -84,6 +84,6 @@ public class RaceUnitTest {
         Set<ConstraintViolation<Race>> violations = validator.validate(race, ValidationGroupe.OnCreate.class);
 
         Assertions.assertTrue(violations.isEmpty(),
-            "La race aurait dû être valide mais des violations ont été détectées");
+            "La race aurait dû être valide mais " + violations.size() + " violation(s) détectée(s)");
     }
 }
