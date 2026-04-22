@@ -35,3 +35,17 @@ INSERT INTO competence (nom, description) VALUES
     - Débutant : Calme en présence d''autres chiens tenus en laisse, tolère les inconnus à distance.
     - Intermédiaire : Interaction contrôlée avec chiens congénères, urbain animé, transports courts.
     - Confirmé : Comportement neutre en toutes situations, foule, enfants, autres espèces.');
+
+-- Utilisateurs
+-- NB: password en clair pour l'instant, le hash arrivera avec Spring Security
+INSERT INTO utilisateur (nom, prenom, email, password, date_inscription, telephone, id_role) VALUES
+    ('Dupont', 'Jean', 'jean.dupont@mail.fr', 'motdepasse123', '2025-01-15', '0612345678', 1),
+    ('Martin', 'Sophie', 'sophie.martin@mail.fr', 'motdepasse123', '2025-02-03', '0687654321', 1),
+    ('Bernard', 'Lucas', 'lucas.bernard@mail.fr', 'motdepasse123', '2024-11-20', NULL, 2),
+    ('Lefevre', 'Claire', 'claire.lefevre@mail.fr', 'motdepasse123', '2024-09-10', '0654321987', 3);
+
+-- Chiens
+INSERT INTO chien (nom, poids, taille, sexe, date_naissance, numero_puce, id_utilisateur, id_race) VALUES
+    ('Rex', 32.5, 60.0, 'MALE', '2020-05-12', '250269802345678', 1, 1),
+    ('Luna', 28.0, 55.0, 'FEMELLE', '2021-08-30', '250269802345679', 1, 2),
+    ('Bella', 6.5, 30.0, 'FEMELLE', '2022-03-15', '250269802345680', 2, 3);

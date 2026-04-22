@@ -3,6 +3,7 @@ package edu.mns.cda.clubcaninbackend.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
+import edu.mns.cda.clubcaninbackend.view.ChienView;
 import edu.mns.cda.clubcaninbackend.view.UtilisateurView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -23,26 +24,26 @@ import java.util.List;
 public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(UtilisateurView.class)
+    @JsonView({UtilisateurView.class, ChienView.class})
     protected Integer id;
 
     @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false, length = 50)
     @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
-    @JsonView(UtilisateurView.class)
+    @JsonView({UtilisateurView.class,ChienView.class})
     protected String nom;
 
     @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false, length = 50)
     @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
-    @JsonView(UtilisateurView.class)
+    @JsonView({UtilisateurView.class,ChienView.class})
     protected String prenom;
 
     @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Email(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false, unique = true, length = 100)
     @Size(max = 100, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
-    @JsonView(UtilisateurView.class)
+    @JsonView({UtilisateurView.class,ChienView.class})
     protected String email;
 
     @NotBlank(groups = ValidationGroupe.OnCreate.class)
@@ -57,7 +58,7 @@ public class Utilisateur {
     protected LocalDate dateInscription;
 
     @Size(max = 20, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "Le numéro de téléphone est trop long")
-    @JsonView(UtilisateurView.class)
+    @JsonView({UtilisateurView.class,ChienView.class})
     protected String telephone;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
