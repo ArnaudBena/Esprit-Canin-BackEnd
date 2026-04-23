@@ -3,6 +3,7 @@ package edu.mns.cda.clubcaninbackend.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.view.ChienView;
+import edu.mns.cda.clubcaninbackend.view.InscriptionView;
 import edu.mns.cda.clubcaninbackend.view.SeanceView;
 import edu.mns.cda.clubcaninbackend.view.UtilisateurView;
 import jakarta.persistence.*;
@@ -23,12 +24,12 @@ import java.util.List;
 public class Chien {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView({ChienView.class, UtilisateurView.class})
+    @JsonView({ChienView.class, UtilisateurView.class, InscriptionView.class})
     protected Integer id;
 
     @NotBlank
     @Column(nullable = false, length = 50)
-    @JsonView({ChienView.class, SeanceView.class,UtilisateurView.class})
+    @JsonView({ChienView.class, SeanceView.class,UtilisateurView.class, InscriptionView.class})
     protected String nom;
 
     @NotNull

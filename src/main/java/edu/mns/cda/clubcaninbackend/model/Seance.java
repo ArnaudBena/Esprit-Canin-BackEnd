@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.clubcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.clubcaninbackend.view.CompetenceView;
+import edu.mns.cda.clubcaninbackend.view.InscriptionView;
 import edu.mns.cda.clubcaninbackend.view.SeanceView;
 import edu.mns.cda.clubcaninbackend.view.TypeSeanceView;
 import jakarta.persistence.*;
@@ -25,20 +26,20 @@ import java.util.List;
 public class Seance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(SeanceView.class)
+    @JsonView({SeanceView.class, InscriptionView.class})
     protected Integer id;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @FutureOrPresent(groups = ValidationGroupe.OnCreate.class)
     @Column(nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @JsonView(SeanceView.class)
+    @JsonView({SeanceView.class,InscriptionView.class})
     protected LocalDate date;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
     @JsonFormat(pattern = "HH:mm:ss")
-    @JsonView(SeanceView.class)
+    @JsonView({SeanceView.class,InscriptionView.class})
     protected LocalTime heureDebut;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})

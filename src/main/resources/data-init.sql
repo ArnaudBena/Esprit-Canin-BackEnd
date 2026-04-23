@@ -67,3 +67,11 @@ INSERT INTO seance (date, heure_debut, duree_minutes, statut, id_type_seance, id
     ('2026-05-10', '10:00:00', 60, 'DISPONIBLE', 1, 3),
     ('2026-05-15', '14:00:00', 90, 'DISPONIBLE', 2, 3),
     ('2026-05-20', '09:30:00', 60, 'DISPONIBLE', 3, 3);
+
+-- Inscriptions (chien → séance)
+-- Rex (chien 1) et Luna (chien 2) s'inscrivent à la séance 1 (Obéissance)
+-- Bella (chien 3) s'inscrit à la séance 2 (Agilité)
+INSERT INTO inscription (id_chien, id_seance, date_inscription, commentaire_coach, statut_presence, acquisition_validee) VALUES
+    (1, 1, '2026-04-20', NULL, 'INSCRIT', false),
+    (2, 1, '2026-04-21', NULL, 'INSCRIT', false),
+    (3, 2, '2026-04-22', 'Bella progresse bien sur le slalom', 'INSCRIT', false);
