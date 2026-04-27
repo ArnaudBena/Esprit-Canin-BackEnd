@@ -34,12 +34,12 @@ public class GlobalExceptionInterceptor {
     public Map<String, String> constraintViolationDatabase(DataIntegrityViolationException ex) {
 
 
-        return Map.of("Erreur", "Erreur de contrainte dans la base de données");
+        return Map.of("erreur", "Erreur de contrainte dans la base de données");
     }
 
     @ExceptionHandler(SeanceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> seanceNotFound(SeanceNotFoundException ex) {
-        return Map.of("Erreur", ex.getMessage());
+        return Map.of("erreur", ex.getMessage());
     }
 }
