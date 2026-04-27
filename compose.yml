@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:18
-    container_name: club_canin_backend
+    container_name: esprit_canin_backend
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root

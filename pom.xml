@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>edu.mns.cda</groupId>
-    <artifactId>Club-Canin-BackEnd</artifactId>
+    <artifactId>Esprit-Canin-BackEnd</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Club-Canin-BackEnd</name>
-    <description>Club-Canin-BackEnd</description>
+    <name>Esprit-Canin-BackEnd</name>
+    <description>Esprit-Canin-BackEnd</description>
     <url/>
     <licenses>
         <license/>
