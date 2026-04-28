@@ -6,9 +6,9 @@ INSERT INTO race (nom) VALUES
 
 -- Roles
 INSERT INTO role (nom, description) VALUES
-    ('ADHERENT', 'Utilisateur inscrit au club, peut inscrire ses chiens aux séances'),
-    ('COACH', 'Éducateur canin habilité à animer les séances'),
-    ('ADMIN', 'Administrateur du club, gère les utilisateurs et le catalogue');
+    ('Adherent', 'Utilisateur inscrit au club, peut inscrire ses chiens aux séances'),
+    ('Coach', 'Éducateur canin habilité à animer les séances'),
+    ('Admin', 'Administrateur du club, gère les utilisateurs et le catalogue de séances et de type de séances');
 
 -- Compétences
 INSERT INTO competence (nom, description) VALUES

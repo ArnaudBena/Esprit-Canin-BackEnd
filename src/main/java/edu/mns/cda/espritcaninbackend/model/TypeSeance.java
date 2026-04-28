@@ -28,7 +28,7 @@ public class TypeSeance {
     protected Integer id;
 
     @Column(nullable = false, unique = true)
-    @NotBlank(message = "Le libellé du cours ne peut pas être vide")
+    @NotBlank(message = "Le libellé de la séance ne peut pas être vide")
     @JsonView({TypeSeanceView.class, SeanceView.class})
     protected String libelle;
 
