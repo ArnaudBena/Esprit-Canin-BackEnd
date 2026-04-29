@@ -51,7 +51,6 @@ public class Utilisateur {
     @Size(min = 8, groups = ValidationGroupe.OnCreate.class, message = "Le mot de passe ne peut pas faire moins de 8 caractères")
     protected String password;
 
-    @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @CreatedDate
     @Column(nullable = false, updatable = false)
     @JsonView(UtilisateurView.class)

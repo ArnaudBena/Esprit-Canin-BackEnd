@@ -160,16 +160,21 @@ public class UtilisateurUnitTest {
     }
 
     @Test
-    @DisplayName("Un utilisateur avec une dateInscription null doit échouer la validation (@NotNull)")
-    public void validUtilisateurWithNullDateInscription_shouldNotBeValid() {
+    @DisplayName("Un utilisateur avec une dateInscription null doit être valide (auto-rempli par @CreatedDate)")
+    public void validUtilisateurWithNullDateInscription_shouldBeValid() {
         Utilisateur utilisateur = new Utilisateur();
-        // dateInscription reste null volontairement
+        utilisateur.setNom("Dupont");
+        utilisateur.setPrenom("Jean");
+        utilisateur.setEmail("jean.dupont@example.com");
+        utilisateur.setPassword("motdepasse123");
+        utilisateur.setRole(new Role()); // role minimal pour passer @NotNull
+        // dateInscription reste null volontairement : sera renseignée par @CreatedDate au save
 
         Set<ConstraintViolation<Utilisateur>> violations = validator.validate(utilisateur, ValidationGroupe.OnCreate.class);
 
-        boolean erreurExiste = TestUtilitaire.constraintViolationExist(violations, "dateInscription", "NotNull");
+        boolean erreurExisteSurDate = TestUtilitaire.constraintViolationExist(violations, "dateInscription", "NotNull");
 
-        Assertions.assertTrue(erreurExiste, "La contrainte @NotNull sur dateInscription n'a pas fonctionné");
+        Assertions.assertFalse(erreurExisteSurDate, "dateInscription doit pouvoir être null à la validation (renseignée plus tard par @CreatedDate)");
     }
 
     @Test

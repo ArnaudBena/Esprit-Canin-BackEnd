@@ -163,6 +163,7 @@ public class UtilisateurController {
                     L'ID du corps JSON est écrasé par celui de l'URL pour éviter toute incohérence.
                     Retourne une erreur 404 si l'ID est introuvable en base.
                     Retourne un statut 204 sans corps de réponse si la mise à jour est réussie.
+                    Le password n'est pas modifiable via cet endpoint
                     """
     )
     @ApiResponses(value = {
@@ -183,7 +184,7 @@ public class UtilisateurController {
             @Parameter(description = "Identifiant unique de l'utilisateur à mettre à jour", required = true, example = "1")
             @PathVariable Integer id,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Objet Utilisateur avec les nouvelles valeurs. L'ID sera écrasé par celui de l'URL",
+                    description = "Objet Utilisateur avec les nouvelles valeurs. L'ID sera écrasé par celui de l'URL. Le password n'est pas modifiable via cet endpoint, utiliser PATCH /utilisateur/{id}/password.",
                     required = true
             )
             @RequestBody
@@ -196,10 +197,54 @@ public class UtilisateurController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        utilisateurToUpdate.setId(id);
+        // On part de l'existant pour ne pas écraser les champs non modifiables (password, dateInscription).
+        Utilisateur existant = optionalUtilisateur.get();
+        existant.setNom(utilisateurToUpdate.getNom());
+        existant.setPrenom(utilisateurToUpdate.getPrenom());
+        existant.setEmail(utilisateurToUpdate.getEmail());
+        existant.setTelephone(utilisateurToUpdate.getTelephone());
+        existant.setRole(utilisateurToUpdate.getRole());
 
-        utilisateurDao.save(utilisateurToUpdate);
+        utilisateurDao.save(existant);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PatchMapping("/{id}/password")
+    @Operation(
+            summary = "Modifier le mot de passe d'un utilisateur",
+            description = """
+                    Met à jour uniquement le mot de passe de l'utilisateur identifié par son ID.
+                    Le nouveau mot de passe doit faire au moins 8 caractères.
+                    Retourne une erreur 404 si l'ID est introuvable.
+                    Retourne un statut 204 sans corps de réponse si la mise à jour est réussie.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Mot de passe mis à jour avec succès"),
+            @ApiResponse(responseCode = "404", description = "Aucun utilisateur ne correspond à cet ID"),
+            @ApiResponse(responseCode = "400", description = "Mot de passe trop court (min 8 caractères) ou manquant")
+    })
+    public ResponseEntity<Void> updatePassword(
+            @Parameter(description = "Identifiant unique de l'utilisateur", required = true, example = "1")
+            @PathVariable Integer id,
+            @RequestBody PasswordUpdateRequest body
+    ) {
+        if (body == null || body.password() == null || body.password().length() < 8) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Optional<Utilisateur> optionalUtilisateur = utilisateurDao.findById(id);
+        if (optionalUtilisateur.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Utilisateur existant = optionalUtilisateur.get();
+        // TODO Spring Security : hasher avec BCryptPasswordEncoder avant save.
+        existant.setPassword(body.password());
+        utilisateurDao.save(existant);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    public record PasswordUpdateRequest(String password) {}
 }
+
