@@ -53,7 +53,7 @@ public class Chien {
     @NotNull
     @PastOrPresent
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     @JsonView({ChienView.class,UtilisateurView.class})
     protected LocalDate dateNaissance;
 

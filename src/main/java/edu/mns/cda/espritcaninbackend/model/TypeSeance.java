@@ -27,7 +27,7 @@ public class TypeSeance {
     @JsonView(TypeSeanceView.class)
     protected Integer id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true) // peut être enlever le unique
     @NotBlank(message = "Le libellé de la séance ne peut pas être vide")
     @JsonView({TypeSeanceView.class, SeanceView.class})
     protected String libelle;
