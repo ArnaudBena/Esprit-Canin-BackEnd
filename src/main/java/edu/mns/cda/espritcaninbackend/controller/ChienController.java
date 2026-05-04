@@ -15,7 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -106,16 +108,18 @@ public class ChienController {
     @Operation(
             summary = "Supprimer un chien par son ID",
             description = """
-                    Supprime définitivement le chien correspondant à l'ID passé en path variable.
-                    Retourne une erreur 404 si l'ID est introuvable en base.
-                    Retourne un statut 204 sans corps de réponse si la suppression est réussie.
-                    """
+                Supprime définitivement le chien correspondant à l'ID passé en path variable.
+                Refusé (409 Conflict) si le chien a des inscriptions à venir.
+                Les compétences et inscriptions passées sont supprimées en cascade.
+                Retourne 404 si l'ID est introuvable, 204 si la suppression est réussie.
+                """
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Chien supprimé avec succès, aucun contenu retourné"),
-            @ApiResponse(responseCode = "404", description = "Aucun chien ne correspond à cet ID")
+            @ApiResponse(responseCode = "404", description = "Aucun chien ne correspond à cet ID"),
+            @ApiResponse(responseCode = "409", description = "Le chien a des inscriptions à venir, suppression refusée")
     })
-    public ResponseEntity<Chien> deleteChien(
+    public ResponseEntity<?> deleteChien(
             @Parameter(description = "Identifiant unique du chien à supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
@@ -123,6 +127,18 @@ public class ChienController {
 
         if (optionalChien.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Chien chien = optionalChien.get();
+
+        // Garde-fou métier : on refuse la suppression si le chien a des inscriptions à venir.
+        // Les inscriptions passées et compétences seront supprimées via cascade JPA (CascadeType.REMOVE sur Chien.java).
+        boolean aInscriptionsFutures = chien.getInscriptions().stream()
+                .anyMatch(i -> i.getSeance().getDate().isAfter(LocalDate.now()));
+
+        if (aInscriptionsFutures) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("erreur","Ce chien a des inscriptions à venir. Annulez-les avant de supprimer."));
         }
 
         chienDao.deleteById(id);

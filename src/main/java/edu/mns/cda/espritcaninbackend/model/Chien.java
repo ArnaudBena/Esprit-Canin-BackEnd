@@ -74,11 +74,11 @@ public class Chien {
     @JsonView({ChienView.class,UtilisateurView.class})
     protected Race race;
 
-    @OneToMany(mappedBy = "chien")
+    @OneToMany(mappedBy = "chien", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonView(ChienView.class)
     protected List<ChienCompetence> chienCompetences;
 
-    @OneToMany(mappedBy = "chien")
+    @OneToMany(mappedBy = "chien", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonView(ChienView.class)
     protected List<Inscription> inscriptions;
 }
