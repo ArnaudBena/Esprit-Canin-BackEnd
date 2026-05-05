@@ -38,11 +38,11 @@ public class TypeSeance {
 
     @Min(value = 0, message = "L'âge minimum ne peut pas être négatif")
     @JsonView({TypeSeanceView.class,SeanceView.class})
-    protected Integer ageMinimum;
+    protected Integer ageMinimumMois;
 
-    @Max(value = 30, message = "L'âge maximum ne peut pas dépasser 30 ans")
+    @Max(value = 360, message = "L'âge maximum ne peut pas dépasser 30 ans (360 mois)")
     @JsonView({TypeSeanceView.class,SeanceView.class})
-    protected Integer ageMaximum;
+    protected Integer ageMaximumMois;
 
     @NotNull
     @Column(nullable = false)
@@ -52,7 +52,7 @@ public class TypeSeance {
 
     @NotNull
     @Column(nullable = false)
-    @Max(value = 240, message = "La durée maximale ne peut pas être supérieure à 4h")
+    @Max(value = 240, message = "La durée maximale ne peut pas être supérieure à 4h (240 mins)")
     @JsonView(TypeSeanceView.class)
     protected Integer dureeMaximale;
 
