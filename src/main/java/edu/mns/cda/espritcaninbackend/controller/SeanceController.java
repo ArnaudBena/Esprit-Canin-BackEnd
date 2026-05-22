@@ -1,7 +1,7 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.espritcaninbackend.dao.SeanceDao;
+import edu.mns.cda.espritcaninbackend.service.SeanceService;
 import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.espritcaninbackend.view.SeanceView;
@@ -30,7 +30,7 @@ import java.util.Optional;
 @CrossOrigin
 public class SeanceController {
 
-    protected final SeanceDao seanceDao;
+    protected final SeanceService seanceService;
 
     @GetMapping("/list")
     @Operation(
@@ -46,7 +46,7 @@ public class SeanceController {
     })
     @JsonView(SeanceView.class)
     public List<Seance> getAllSeances() {
-        return seanceDao.findAll();
+        return seanceService.findAll();
     }
 
     @GetMapping("/{id}")
@@ -66,7 +66,7 @@ public class SeanceController {
             @Parameter(description = "Identifiant unique de la séance", required = true, example = "1")
             @PathVariable Integer id
     ) {
-        Optional<Seance> optionalSeance = seanceDao.findById(id);
+        Optional<Seance> optionalSeance = seanceService.findById(id);
 
         if (optionalSeance.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -96,9 +96,8 @@ public class SeanceController {
             @RequestBody
             @Validated(ValidationGroupe.OnCreate.class) Seance seanceToInsert
     ) {
-        seanceToInsert.setId(null);
 
-        seanceDao.save(seanceToInsert);
+        seanceService.insert(seanceToInsert);
 
         return new ResponseEntity<>(seanceToInsert, HttpStatus.CREATED);
     }
@@ -120,13 +119,8 @@ public class SeanceController {
             @Parameter(description = "Identifiant unique de la séance à supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
-        Optional<Seance> optionalSeance = seanceDao.findById(id);
 
-        if (optionalSeance.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        seanceDao.deleteById(id);
+        seanceService.delete(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -157,15 +151,8 @@ public class SeanceController {
             @Validated(ValidationGroupe.OnUpdate.class)
             Seance seanceToUpdate
     ) {
-        Optional<Seance> optionalSeance = seanceDao.findById(id);
 
-        if (optionalSeance.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        seanceToUpdate.setId(id);
-
-        seanceDao.save(seanceToUpdate);
+        seanceService.update(id, seanceToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

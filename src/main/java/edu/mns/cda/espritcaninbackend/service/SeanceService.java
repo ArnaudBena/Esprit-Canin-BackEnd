@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,6 +21,10 @@ public class SeanceService {
         return seanceDao.findById(id);
     }
 
+    public List<Seance> findAll() {
+        return seanceDao.findAll();
+    }
+
     public void insert(Seance seance) {
         seance.setId(null);
         validerDuree(seance);
@@ -27,6 +32,10 @@ public class SeanceService {
     }
 
     public void delete(int id) {
+        Optional<Seance> optionalSeance = seanceDao.findById(id);
+        if (optionalSeance.isEmpty()) {
+            throw new SeanceNotFoundException(id);
+        }
         seanceDao.deleteById(id);
     }
 
