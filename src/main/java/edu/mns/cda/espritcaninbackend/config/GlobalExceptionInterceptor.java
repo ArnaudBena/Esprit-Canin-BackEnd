@@ -1,5 +1,6 @@
 package edu.mns.cda.espritcaninbackend.config;
 
+import edu.mns.cda.espritcaninbackend.exception.InscriptionNotFoundException;
 import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,12 @@ public class GlobalExceptionInterceptor {
     @ExceptionHandler(SeanceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> seanceNotFound(SeanceNotFoundException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(InscriptionNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> inscriptionNotFound(InscriptionNotFoundException ex) {
         return Map.of("erreur", ex.getMessage());
     }
 }

@@ -3,6 +3,7 @@ package edu.mns.cda.espritcaninbackend.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.dao.InscriptionDao;
 import edu.mns.cda.espritcaninbackend.model.Inscription;
+import edu.mns.cda.espritcaninbackend.service.InscriptionService;
 import edu.mns.cda.espritcaninbackend.view.InscriptionView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +30,7 @@ import java.util.Optional;
 @CrossOrigin
 public class InscriptionController {
 
-    protected final InscriptionDao inscriptionDao;
+    protected final InscriptionService inscriptionService;
 
     @GetMapping("/list")
     @Operation(
@@ -41,7 +42,7 @@ public class InscriptionController {
     })
     @JsonView(InscriptionView.class)
     public List<Inscription> getAll() {
-        return inscriptionDao.findAll();
+        return inscriptionService.findAll();
     }
 
     @GetMapping("/{idChien}/{idSeance}")
@@ -65,7 +66,7 @@ public class InscriptionController {
             @PathVariable Integer idSeance
     ) {
         Inscription.Key key = new Inscription.Key(idChien, idSeance);
-        Optional<Inscription> optionalInscription = inscriptionDao.findById(key);
+        Optional<Inscription> optionalInscription = inscriptionService.findById(key);
 
         if (optionalInscription.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -100,15 +101,7 @@ public class InscriptionController {
                 inscriptionToInsert.getSeance().getId()
         );
 
-        Optional<Inscription> optionalInscription = inscriptionDao.findById(key);
-
-        if (optionalInscription.isPresent()) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
-
-        inscriptionToInsert.setId(key);
-
-        inscriptionDao.save(inscriptionToInsert);
+        inscriptionService.insert(inscriptionToInsert);
 
         return new ResponseEntity<>(inscriptionToInsert, HttpStatus.CREATED);
     }
@@ -132,13 +125,8 @@ public class InscriptionController {
             @PathVariable Integer idSeance
     ) {
         Inscription.Key key = new Inscription.Key(idChien, idSeance);
-        Optional<Inscription> optionalInscription = inscriptionDao.findById(key);
 
-        if (optionalInscription.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        inscriptionDao.deleteById(key);
+        inscriptionService.delete(key);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -167,15 +155,8 @@ public class InscriptionController {
             @Valid Inscription inscriptionToUpdate
     ) {
         Inscription.Key key = new Inscription.Key(idChien, idSeance);
-        Optional<Inscription> optionalInscription = inscriptionDao.findById(key);
 
-        if (optionalInscription.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        inscriptionToUpdate.setId(key);
-
-        inscriptionDao.save(inscriptionToUpdate);
+        inscriptionService.update(key, inscriptionToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
