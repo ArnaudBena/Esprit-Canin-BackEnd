@@ -4,5 +4,5 @@ public enum StatutPresence {
     INSCRIT,
     PRESENT,
     ABSENT,
-    ANNULE
+    ANNULEE
 }
