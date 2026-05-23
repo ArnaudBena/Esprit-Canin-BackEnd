@@ -8,10 +8,10 @@ import edu.mns.cda.espritcaninbackend.model.StatutSeance;
 import edu.mns.cda.espritcaninbackend.model.Utilisateur;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +37,7 @@ public class SeanceService {
         }
         validerCoach(seance);
         validerDuree(seance);
+        validerChevauchement(seance);
         seanceDao.save(seance);
     }
 
@@ -67,6 +68,7 @@ public class SeanceService {
         seanceToUpdate.setId(id);
         validerCoach(seanceToUpdate);
         validerDuree(seanceToUpdate);
+        validerChevauchement(seanceToUpdate);
         seanceDao.save(seanceToUpdate);
     }
 
@@ -119,6 +121,32 @@ public class SeanceService {
                     HttpStatus.BAD_REQUEST,
                     "L'utilisateur assigné doit avoir le rôle Coach"
             );
+        }
+    }
+
+    private void validerChevauchement(Seance seance) {
+        List<Seance> seancesDuJour = seanceDao.findByCoachAndDate(seance.getCoach(), seance.getDate());
+
+        LocalTime debutA = seance.getHeureDebut();
+        LocalTime finA = debutA.plusMinutes(seance.getDureeMinutes());
+
+        for (Seance autre : seancesDuJour) {
+            // On ignore la séance qu'on est en train de modifier sinon elle se chauverait elle même
+            if (autre.getId().equals(seance.getId())) continue;
+
+            // On ignore les séances annulées car elle n'ont plus lieu
+            if (autre.getStatut() == StatutSeance.ANNULEE) continue;
+
+            LocalTime debutB = autre.getHeureDebut();
+            LocalTime finB =  debutB.plusMinutes(autre.getDureeMinutes());
+
+            // Chevauchement : finA > debutB et finB > debutA
+            if (finA.isAfter(debutB) && finB.isAfter(finA)) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "Le coach a déjà une seance ce jour-là entre " + debutB + " et " + finB
+                );
+            }
         }
     }
 }
