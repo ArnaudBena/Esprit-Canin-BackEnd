@@ -141,7 +141,7 @@ public class SeanceService {
             LocalTime finB =  debutB.plusMinutes(autre.getDureeMinutes());
 
             // Chevauchement : finA > debutB et finB > debutA
-            if (finA.isAfter(debutB) && finB.isAfter(finA)) {
+            if (finA.isAfter(debutB) && finB.isAfter(debutA)) {
                 throw new ResponseStatusException(
                         HttpStatus.CONFLICT,
                         "Le coach a déjà une seance ce jour-là entre " + debutB + " et " + finB
