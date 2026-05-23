@@ -40,6 +40,15 @@ public class SeanceService {
         if (optionalSeance.isEmpty()) {
             throw new SeanceNotFoundException(id);
         }
+
+        Seance seance = optionalSeance.get();
+        if (seance.getInscriptions() != null && !seance.getInscriptions().isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Cette séance a des inscriptions. Annulez-la avant de la supprimer"
+            );
+        }
+
         seanceDao.deleteById(id);
     }
 
