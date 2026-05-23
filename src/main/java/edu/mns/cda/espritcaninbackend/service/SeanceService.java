@@ -1,10 +1,12 @@
 package edu.mns.cda.espritcaninbackend.service;
 
 import edu.mns.cda.espritcaninbackend.dao.SeanceDao;
+import edu.mns.cda.espritcaninbackend.dao.TypeSeanceDao;
 import edu.mns.cda.espritcaninbackend.dao.UtilisateurDao;
 import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
 import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.model.StatutSeance;
+import edu.mns.cda.espritcaninbackend.model.TypeSeance;
 import edu.mns.cda.espritcaninbackend.model.Utilisateur;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ public class SeanceService {
 
     protected final SeanceDao seanceDao;
     protected final UtilisateurDao utilisateurDao;
+    protected final TypeSeanceDao typeSeanceDao;
 
     public Optional<Seance> findById(int id) {
         return seanceDao.findById(id);
@@ -73,12 +76,19 @@ public class SeanceService {
     }
 
     private void validerDuree(Seance seance) {
-        if (seance.getTypeSeance() == null) {
+        if (seance.getTypeSeance() == null || seance.getTypeSeance().getId() == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Le type de séance est obligatoire"
             );
         }
+
+        TypeSeance typeSeance = typeSeanceDao.findById(seance.getTypeSeance().getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Type de séance introuvable (id: " + seance.getTypeSeance().getId() + ")"
+
+                ));
 
         int duree = seance.getDureeMinutes();
         int min = seance.getTypeSeance().getDureeMinimale();
