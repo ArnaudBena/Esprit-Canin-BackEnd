@@ -24,7 +24,7 @@ public class TypeSeance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(TypeSeanceView.class)
+    @JsonView({TypeSeanceView.class, SeanceView.class})
     protected Integer id;
 
     @Column(nullable = false, unique = true) // peut être enlever le unique

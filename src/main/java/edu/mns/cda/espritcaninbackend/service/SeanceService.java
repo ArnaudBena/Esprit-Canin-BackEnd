@@ -91,8 +91,8 @@ public class SeanceService {
                 ));
 
         int duree = seance.getDureeMinutes();
-        int min = seance.getTypeSeance().getDureeMinimale();
-        int max = seance.getTypeSeance().getDureeMaximale();
+        int min = typeSeance.getDureeMinimale();
+        int max = typeSeance.getDureeMaximale();
 
         if (duree < min) {
             throw new ResponseStatusException(

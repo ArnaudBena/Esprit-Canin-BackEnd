@@ -24,7 +24,7 @@ import java.util.List;
 public class Chien {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView({ChienView.class, UtilisateurView.class, InscriptionView.class})
+    @JsonView({ChienView.class, UtilisateurView.class, InscriptionView.class, SeanceView.class})
     protected Integer id;
 
     @NotBlank

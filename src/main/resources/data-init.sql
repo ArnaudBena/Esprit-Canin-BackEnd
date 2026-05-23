@@ -40,7 +40,9 @@ INSERT INTO utilisateur (nom, prenom, email, password, date_inscription, telepho
     ('Dupont', 'Jean', 'jean.dupont@mail.fr', 'motdepasse123', '2025-01-15', '0612345678', 1),
     ('Martin', 'Sophie', 'sophie.martin@mail.fr', 'motdepasse123', '2025-02-03', '0687654321', 1),
     ('Bernard', 'Lucas', 'lucas.bernard@mail.fr', 'motdepasse123', '2024-11-20', NULL, 2),
-    ('Lefevre', 'Claire', 'claire.lefevre@mail.fr', 'motdepasse123', '2024-09-10', '0654321987', 3);
+    ('Lefevre', 'Claire', 'claire.lefevre@mail.fr', 'motdepasse123', '2024-09-10', '0654321987', 3),
+    ('Petit', 'Camille', 'camille.petit@mail.fr', 'motdepasse123', '2024-10-15', '0698765432', 2),
+    ('Garcia', 'Thomas', 'thomas.garcia@mail.fr', 'motdepasse123', '2025-03-01', NULL, 2);
 
 -- Chiens
 INSERT INTO chien (nom, poids, taille, sexe, date_naissance, numero_puce, id_utilisateur, id_race) VALUES

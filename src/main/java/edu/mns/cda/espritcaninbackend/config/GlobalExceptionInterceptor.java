@@ -4,11 +4,13 @@ import edu.mns.cda.espritcaninbackend.exception.InscriptionNotFoundException;
 import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,5 +50,13 @@ public class GlobalExceptionInterceptor {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> inscriptionNotFound(InscriptionNotFoundException ex) {
         return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> responseStatusException(ResponseStatusException ex) {
+        String message = ex.getReason() != null ? ex.getReason() : "Erreur";
+        return ResponseEntity
+                .status(ex.getStatusCode())
+                .body(Map.of("erreur", message));
     }
 }
