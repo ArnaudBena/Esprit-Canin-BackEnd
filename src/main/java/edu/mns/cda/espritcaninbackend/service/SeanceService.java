@@ -1,11 +1,14 @@
 package edu.mns.cda.espritcaninbackend.service;
 
 import edu.mns.cda.espritcaninbackend.dao.SeanceDao;
+import edu.mns.cda.espritcaninbackend.dao.UtilisateurDao;
 import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
 import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.model.StatutSeance;
+import edu.mns.cda.espritcaninbackend.model.Utilisateur;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -17,6 +20,7 @@ import java.util.Optional;
 public class SeanceService {
 
     protected final SeanceDao seanceDao;
+    protected final UtilisateurDao utilisateurDao;
 
     public Optional<Seance> findById(int id) {
         return seanceDao.findById(id);
@@ -31,6 +35,7 @@ public class SeanceService {
         if (seance.getStatut() == null) {
             seance.setStatut(StatutSeance.ACTIVE);
         }
+        validerCoach(seance);
         validerDuree(seance);
         seanceDao.save(seance);
     }
@@ -60,6 +65,7 @@ public class SeanceService {
         }
 
         seanceToUpdate.setId(id);
+        validerCoach(seanceToUpdate);
         validerDuree(seanceToUpdate);
         seanceDao.save(seanceToUpdate);
     }
@@ -87,6 +93,31 @@ public class SeanceService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "La durée ne peut pas depasser " + max + " minutes"
+            );
+        }
+    }
+
+    private void validerCoach(Seance seance) {
+        if (seance.getCoach() == null || seance.getCoach().getId() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Le coach est obligatoire"
+            );
+        }
+
+        Optional<Utilisateur> coachOptional = utilisateurDao.findById(seance.getCoach().getId());
+        if (coachOptional.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Coach introuvable (id : " + seance.getCoach().getId() + ")"
+            );
+        }
+
+        Utilisateur coach = coachOptional.get();
+        if (coach.getRole() == null || !"Coach".equalsIgnoreCase(coach.getRole().getNom())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "L'utilisateur assigné doit avoir le rôle Coach"
             );
         }
     }
