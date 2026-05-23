@@ -3,6 +3,7 @@ package edu.mns.cda.espritcaninbackend.service;
 import edu.mns.cda.espritcaninbackend.dao.SeanceDao;
 import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
 import edu.mns.cda.espritcaninbackend.model.Seance;
+import edu.mns.cda.espritcaninbackend.model.StatutSeance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,9 @@ public class SeanceService {
 
     public void insert(Seance seance) {
         seance.setId(null);
+        if (seance.getStatut() == null) {
+            seance.setStatut(StatutSeance.ACTIVE);
+        }
         validerDuree(seance);
         seanceDao.save(seance);
     }

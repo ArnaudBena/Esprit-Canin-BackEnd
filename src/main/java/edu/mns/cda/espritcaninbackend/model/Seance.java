@@ -68,7 +68,7 @@ public class Seance {
     @JsonView(SeanceView.class)
     protected List<Inscription> inscriptions;
 
-    @JsonView({SeanceView.class, Inscription.class})
+    @JsonView({SeanceView.class, InscriptionView.class})
     public Boolean getComplet() {
         if (inscriptions == null || typeSeance == null || typeSeance.getParticipantsMaximum() == null) {
             return false;
