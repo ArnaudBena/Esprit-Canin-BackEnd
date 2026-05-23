@@ -67,4 +67,18 @@ public class Seance {
     @OneToMany(mappedBy = "seance")
     @JsonView(SeanceView.class)
     protected List<Inscription> inscriptions;
+
+    @JsonView({SeanceView.class, Inscription.class})
+    public Boolean getComplet() {
+        if (inscriptions == null || typeSeance == null || typeSeance.getParticipantsMaximum() == null) {
+            return false;
+        }
+        return inscriptions.size() >= typeSeance.getParticipantsMaximum();
+    }
+
+    @JsonView({SeanceView.class, InscriptionView.class})
+    public Boolean getTerminee() {
+        if (date == null) return false;
+        return date.isBefore(LocalDate.now());
+    }
 }
