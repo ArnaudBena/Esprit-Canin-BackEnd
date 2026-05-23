@@ -1,7 +1,6 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.espritcaninbackend.dao.InscriptionDao;
 import edu.mns.cda.espritcaninbackend.model.Inscription;
 import edu.mns.cda.espritcaninbackend.service.InscriptionService;
 import edu.mns.cda.espritcaninbackend.view.InscriptionView;
@@ -96,11 +95,6 @@ public class InscriptionController {
             @RequestBody
             @Valid Inscription inscriptionToInsert
     ) {
-        Inscription.Key key = new Inscription.Key(
-                inscriptionToInsert.getChien().getId(),
-                inscriptionToInsert.getSeance().getId()
-        );
-
         inscriptionService.insert(inscriptionToInsert);
 
         return new ResponseEntity<>(inscriptionToInsert, HttpStatus.CREATED);
