@@ -32,7 +32,7 @@ public class DashboardService {
         // KPIs simples
         long totalUtilisateurs = utilisateurDao.count();
         long nouveauxUtilisateursCeMois = utilisateurDao.countNouveauxDepuis(debutMois);
-        long totalchiens = chienDao.count();
+        long totalChiens = chienDao.count();
         long seancesMois = seanceDao.countByStatutEntre(debutMois, finMois, StatutSeance.ACTIVE);
         long seancesMoisDernier = seanceDao.countByStatutEntre(debutMoisDernier, finMoisDernier, StatutSeance.ACTIVE);
 
@@ -47,7 +47,7 @@ public class DashboardService {
         return new DashboardDto(
                 totalUtilisateurs,
                 nouveauxUtilisateursCeMois,
-                totalchiens,
+                totalChiens,
                 seancesMois,
                 seancesMoisDernier,
                 tauxRemplissageMoyen,
