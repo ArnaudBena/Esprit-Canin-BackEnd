@@ -1,7 +1,6 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.espritcaninbackend.dao.RoleDao;
 import edu.mns.cda.espritcaninbackend.model.Role;
 import edu.mns.cda.espritcaninbackend.service.RoleService;
 import edu.mns.cda.espritcaninbackend.view.RoleView;
@@ -136,7 +135,7 @@ public class RoleController {
                     description = "Aucun role ne correspond à cet ID"
             )
     })
-    public ResponseEntity<Role> deleteRole(
+    public ResponseEntity<Void> deleteRole(
             @Parameter(description = "Identifiant unique du role a supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
