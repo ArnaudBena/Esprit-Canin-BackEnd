@@ -17,7 +17,7 @@ public record DashboardDto(
         long totalUtilisateurs,
         long nouveauxUtilisateursCeMois,
         long totalChiens,
-        long seancesMois,
+        long seancesCeMois,
         long seancesMoisDernier,
         int tauxRemplissageMoyen,
         List<Seance> prochainesSeances
