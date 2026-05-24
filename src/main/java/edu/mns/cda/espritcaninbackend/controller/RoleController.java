@@ -3,6 +3,7 @@ package edu.mns.cda.espritcaninbackend.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.dao.RoleDao;
 import edu.mns.cda.espritcaninbackend.model.Role;
+import edu.mns.cda.espritcaninbackend.service.RoleService;
 import edu.mns.cda.espritcaninbackend.view.RoleView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +30,7 @@ import java.util.Optional;
 @CrossOrigin
 public class RoleController {
 
-    protected final RoleDao roleDao;
+    protected final RoleService roleService;
 
     @GetMapping("/list")
     @Operation(
@@ -48,7 +49,7 @@ public class RoleController {
     })
     @JsonView(RoleView.class)
     public List<Role> getAllRoles() {
-        return roleDao.findAll();
+        return roleService.findAll();
     }
 
     @GetMapping("/{id}")
@@ -75,7 +76,7 @@ public class RoleController {
             @PathVariable Integer id
     ) {
 
-        Optional<Role> optionalRole = roleDao.findById(id);
+        Optional<Role> optionalRole = roleService.findById(id);
 
         if (optionalRole.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -111,10 +112,7 @@ public class RoleController {
             @RequestBody
             @Valid Role roleToInsert
     ) {
-
-        roleToInsert.setId(null);
-
-        roleDao.save(roleToInsert);
+        roleService.insert(roleToInsert);
 
         return new ResponseEntity<>(roleToInsert, HttpStatus.CREATED);
     }
@@ -142,14 +140,7 @@ public class RoleController {
             @Parameter(description = "Identifiant unique du role a supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
-
-        Optional<Role> optionalRole = roleDao.findById(id);
-
-        if (optionalRole.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        roleDao.deleteById(id);
+        roleService.delete(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -189,15 +180,7 @@ public class RoleController {
             @Valid
             Role roleToUpdate
     ) {
-        Optional<Role> optionalRole = roleDao.findById(id);
-
-        if (optionalRole.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        roleToUpdate.setId(id);
-
-        roleDao.save(roleToUpdate);
+        roleService.update(id, roleToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -1,6 +1,7 @@
 package edu.mns.cda.espritcaninbackend.config;
 
 import edu.mns.cda.espritcaninbackend.exception.InscriptionNotFoundException;
+import edu.mns.cda.espritcaninbackend.exception.RoleNotFoundException;
 import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -58,5 +59,11 @@ public class GlobalExceptionInterceptor {
         return ResponseEntity
                 .status(ex.getStatusCode())
                 .body(Map.of("erreur", message));
+    }
+
+    @ExceptionHandler(RoleNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> roleNotFound(RoleNotFoundException ex) {
+        return Map.of("erreur", ex.getMessage());
     }
 }
