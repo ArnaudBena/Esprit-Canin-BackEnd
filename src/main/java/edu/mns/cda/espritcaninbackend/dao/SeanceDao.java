@@ -52,7 +52,7 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
                                     @Param("statut") StatutSeance statut);
 
     /**
-     * Recherche des séances pour l'admin (3 filtres alignés sur la maquette ecran-15).
+     * Recherche des séances pour l'admin.
      * TODO post-MVP : ajouter Pageable pour la pagination quand le volume de séances le justifiera.
      */
     @Query("SELECT s FROM Seance s " +
