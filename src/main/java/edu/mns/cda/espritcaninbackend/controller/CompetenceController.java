@@ -1,8 +1,8 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.espritcaninbackend.dao.CompetenceDao;
 import edu.mns.cda.espritcaninbackend.model.Competence;
+import edu.mns.cda.espritcaninbackend.service.CompetenceService;
 import edu.mns.cda.espritcaninbackend.view.CompetenceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -29,7 +29,7 @@ import java.util.Optional;
 @CrossOrigin
 public class CompetenceController {
 
-    protected final CompetenceDao competenceDao;
+    protected final CompetenceService competenceService;
 
     @GetMapping("/list")
     @Operation(
@@ -48,7 +48,7 @@ public class CompetenceController {
     })
     @JsonView(CompetenceView.class)
     public List<Competence> getAllCompetences() {
-        return competenceDao.findAllOrderByNom();
+        return competenceService.findAll();
     }
 
     @GetMapping("/{id}")
@@ -75,7 +75,7 @@ public class CompetenceController {
             @PathVariable Integer id
     ) {
 
-        Optional<Competence> optionalCompetence = competenceDao.findById(id);
+        Optional<Competence> optionalCompetence = competenceService.findById(id);
 
         if (optionalCompetence.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -111,10 +111,7 @@ public class CompetenceController {
             @RequestBody
             @Valid Competence competenceToInsert
     ) {
-
-        competenceToInsert.setId(null);
-
-        competenceDao.save(competenceToInsert);
+        competenceService.insert(competenceToInsert);
 
         return new ResponseEntity<>(competenceToInsert, HttpStatus.CREATED);
     }
@@ -138,18 +135,11 @@ public class CompetenceController {
                     description = "Aucune competence ne correspond à cet ID"
             )
     })
-    public ResponseEntity<Competence> deleteCompetence(
+    public ResponseEntity<Void> deleteCompetence(
             @Parameter(description = "Identifiant unique de la competence a supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
-
-        Optional<Competence> optionalCompetence = competenceDao.findById(id);
-
-        if (optionalCompetence.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        competenceDao.deleteById(id);
+        competenceService.delete(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -189,15 +179,7 @@ public class CompetenceController {
             @Valid
             Competence competenceToUpdate
     ) {
-        Optional<Competence> optionalCompetence = competenceDao.findById(id);
-
-        if (optionalCompetence.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        competenceToUpdate.setId(id);
-
-        competenceDao.save(competenceToUpdate);
+        competenceService.update(id, competenceToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
