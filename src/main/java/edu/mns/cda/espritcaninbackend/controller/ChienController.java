@@ -3,6 +3,7 @@ package edu.mns.cda.espritcaninbackend.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.dao.ChienDao;
 import edu.mns.cda.espritcaninbackend.model.Chien;
+import edu.mns.cda.espritcaninbackend.model.Sexe;
 import edu.mns.cda.espritcaninbackend.view.ChienView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,6 +49,33 @@ public class ChienController {
     @JsonView(ChienView.class)
     public List<Chien> getAllChiens() {
         return chienDao.findAllOrderByNom();
+    }
+
+    @GetMapping("/search")
+    @Operation(
+            summary = "Rechercher des chiens avec filtres",
+            description = """
+                    Retourne la liste filtrée des chiens selon 2 filtres optionnels :
+                    recherche libre dans nom du chien, race, nom/prénom du propriétaire + sexe.
+                    Tri imposé serveur : nom du chien ASC.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste filtrée retournée avec succès")
+    })
+    @JsonView(ChienView.class)
+    public List<Chien> searchChiens(
+            @Parameter(description = "Texte libre cherché dans nom du chien, race, nom/prénom du propriétaire")
+            @RequestParam(required = false) String recherche,
+            @Parameter(description = "Sexe du chien (MALE ou FEMELLE)")
+            @RequestParam(required = false) Sexe sexe
+    ) {
+        // Normalise null/blank en chaîne vide (LIKE '%%' matche tout, évite le bug Postgres bytea sur null)
+        String rechercheNormalisee = (recherche == null || recherche.isBlank()) ? "" : recherche.trim();
+        boolean filtrerSexe = (sexe != null);
+        // Valeur bidon pour le sexe quand on ne filtre pas (évite null binding ambigü)
+        Sexe sexeEffectif = filtrerSexe ? sexe : Sexe.MALE;
+        return chienDao.search(rechercheNormalisee, sexeEffectif, filtrerSexe);
     }
 
     @GetMapping("/{id}")

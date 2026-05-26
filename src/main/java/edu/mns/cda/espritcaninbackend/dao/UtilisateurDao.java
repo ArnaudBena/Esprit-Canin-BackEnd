@@ -19,6 +19,22 @@ public interface UtilisateurDao extends JpaRepository<Utilisateur, Integer> {
     List<Utilisateur> findAllOrderByNomPrenom();
 
     /**
+     * Recherche des utilisateurs pour l'admin.
+     * 2 filtres optionnels :
+     * - recherche : texte cherché dans nom/prénom/email (case-insensitive).
+     *   On reçoit toujours une string non-null (chaîne vide = pas de filtre, LIKE '%%' matche tout).
+     * - roleId : id du rôle (null = pas de filtre, géré nativement par Postgres pour les Integer).
+     */
+    @Query("SELECT u FROM Utilisateur u " +
+            "WHERE (LOWER(u.nom) LIKE LOWER(CONCAT('%', :recherche, '%')) " +
+            "       OR LOWER(u.prenom) LIKE LOWER(CONCAT('%', :recherche, '%')) " +
+            "       OR LOWER(u.email) LIKE LOWER(CONCAT('%', :recherche, '%'))) " +
+            "AND (:roleId IS NULL OR u.role.id = :roleId) " +
+            "ORDER BY u.nom ASC, u.prenom ASC")
+    List<Utilisateur> search(@Param("recherche") String recherche,
+                             @Param("roleId") Integer roleId);
+
+    /**
      * Compte les utilisateurs inscrits depuis la date donnée.
      * Utilisé pour le KPI "nouveaux utilisateurs ce mois" du dashboard admin.
      */

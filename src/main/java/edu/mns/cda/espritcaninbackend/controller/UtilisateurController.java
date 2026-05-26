@@ -52,6 +52,30 @@ public class UtilisateurController {
         return utilisateurDao.findAllOrderByNomPrenom();
     }
 
+    @GetMapping("/search")
+    @Operation(
+            summary = "Rechercher des utilisateurs avec filtres",
+            description = """
+                    Retourne la liste filtrée des utilisateurs selon 2 filtres optionnels (maquette ecran-17) :
+                    recherche libre dans nom/prénom/email + rôle.
+                    Tri imposé serveur : nom ASC, prénom ASC.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste filtrée retournée avec succès")
+    })
+    @JsonView(UtilisateurView.class)
+    public List<Utilisateur> searchUtilisateurs(
+            @Parameter(description = "Texte libre cherché dans nom, prénom et email")
+            @RequestParam(required = false) String recherche,
+            @Parameter(description = "ID du rôle (Adherent, Coach, Admin)")
+            @RequestParam(required = false) Integer roleId
+    ) {
+        // Normalise null/blank en chaîne vide (LIKE '%%' matche tout, évite le bug Postgres bytea sur null)
+        String rechercheNormalisee = (recherche == null || recherche.isBlank()) ? "" : recherche.trim();
+        return utilisateurDao.search(rechercheNormalisee, roleId);
+    }
+
     @GetMapping("/{id}")
     @Operation(
             summary = "Récuperer un utilisateur par son ID",
