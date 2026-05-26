@@ -20,10 +20,7 @@ public interface UtilisateurDao extends JpaRepository<Utilisateur, Integer> {
 
     /**
      * Recherche des utilisateurs pour l'admin.
-     * 2 filtres optionnels :
-     * - recherche : texte cherché dans nom/prénom/email (case-insensitive).
-     *   On reçoit toujours une string non-null (chaîne vide = pas de filtre, LIKE '%%' matche tout).
-     * - roleId : id du rôle (null = pas de filtre, géré nativement par Postgres pour les Integer).
+     * Texte cherché dans nom/prénom/email.
      */
     @Query("SELECT u FROM Utilisateur u " +
             "WHERE (LOWER(u.nom) LIKE LOWER(CONCAT('%', :recherche, '%')) " +

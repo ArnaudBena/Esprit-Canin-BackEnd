@@ -1,9 +1,9 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.espritcaninbackend.dao.ChienDao;
 import edu.mns.cda.espritcaninbackend.model.Chien;
 import edu.mns.cda.espritcaninbackend.model.Sexe;
+import edu.mns.cda.espritcaninbackend.service.ChienService;
 import edu.mns.cda.espritcaninbackend.view.ChienView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,9 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -32,7 +30,7 @@ import java.util.Optional;
 @CrossOrigin
 public class ChienController {
 
-    protected final ChienDao chienDao;
+    protected final ChienService chienService;
 
     @GetMapping("/list")
     @Operation(
@@ -48,7 +46,7 @@ public class ChienController {
     })
     @JsonView(ChienView.class)
     public List<Chien> getAllChiens() {
-        return chienDao.findAllOrderByNom();
+        return chienService.findAll();
     }
 
     @GetMapping("/search")
@@ -70,12 +68,7 @@ public class ChienController {
             @Parameter(description = "Sexe du chien (MALE ou FEMELLE)")
             @RequestParam(required = false) Sexe sexe
     ) {
-        // Normalise null/blank en chaîne vide (LIKE '%%' matche tout, évite le bug Postgres bytea sur null)
-        String rechercheNormalisee = (recherche == null || recherche.isBlank()) ? "" : recherche.trim();
-        boolean filtrerSexe = (sexe != null);
-        // Valeur bidon pour le sexe quand on ne filtre pas (évite null binding ambigü)
-        Sexe sexeEffectif = filtrerSexe ? sexe : Sexe.MALE;
-        return chienDao.search(rechercheNormalisee, sexeEffectif, filtrerSexe);
+        return chienService.search(recherche, sexe);
     }
 
     @GetMapping("/{id}")
@@ -95,7 +88,7 @@ public class ChienController {
             @Parameter(description = "Identifiant unique du chien", required = true, example = "1")
             @PathVariable Integer id
     ) {
-        Optional<Chien> optionalChien = chienDao.findById(id);
+        Optional<Chien> optionalChien = chienService.findById(id);
 
         if (optionalChien.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -125,9 +118,7 @@ public class ChienController {
             @RequestBody
             @Valid Chien chienToInsert
     ) {
-        chienToInsert.setId(null);
-
-        chienDao.save(chienToInsert);
+        chienService.insert(chienToInsert);
 
         return new ResponseEntity<>(chienToInsert, HttpStatus.CREATED);
     }
@@ -136,41 +127,21 @@ public class ChienController {
     @Operation(
             summary = "Supprimer un chien par son ID",
             description = """
-                Supprime définitivement le chien correspondant à l'ID passé en path variable.
-                Refusé (409 Conflict) si le chien a des inscriptions à venir.
-                Les compétences et inscriptions passées sont supprimées en cascade.
-                Retourne 404 si l'ID est introuvable, 204 si la suppression est réussie.
-                """
+            Supprime définitivement le chien correspondant à l'ID passé en path variable.
+            Refusé (409 Conflict) si le chien a au moins une inscription enregistrée.
+            Retourne 404 si l'ID est introuvable, 204 si la suppression est réussie.
+            """
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Chien supprimé avec succès, aucun contenu retourné"),
             @ApiResponse(responseCode = "404", description = "Aucun chien ne correspond à cet ID"),
-            @ApiResponse(responseCode = "409", description = "Le chien a des inscriptions à venir, suppression refusée")
+            @ApiResponse(responseCode = "409", description = "Le chien a des inscriptions enregistrées, suppression refusée")
     })
-    public ResponseEntity<?> deleteChien(
+    public ResponseEntity<Void> deleteChien(
             @Parameter(description = "Identifiant unique du chien à supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
-        Optional<Chien> optionalChien = chienDao.findById(id);
-
-        if (optionalChien.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        Chien chien = optionalChien.get();
-
-        // Garde-fou métier : on refuse la suppression si le chien a des inscriptions à venir.
-        // Les inscriptions passées et compétences seront supprimées via cascade JPA (CascadeType.REMOVE sur Chien.java).
-        boolean aInscriptionsFutures = chien.getInscriptions().stream()
-                .anyMatch(i -> i.getSeance().getDate().isAfter(LocalDate.now()));
-
-        if (aInscriptionsFutures) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("erreur","Ce chien a des inscriptions à venir. Annulez-les avant de supprimer."));
-        }
-
-        chienDao.deleteById(id);
-
+        chienService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -200,15 +171,7 @@ public class ChienController {
             @Valid
             Chien chienToUpdate
     ) {
-        Optional<Chien> optionalChien = chienDao.findById(id);
-
-        if (optionalChien.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        chienToUpdate.setId(id);
-
-        chienDao.save(chienToUpdate);
+        chienService.update(id, chienToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

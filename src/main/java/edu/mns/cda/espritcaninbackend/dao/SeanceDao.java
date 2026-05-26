@@ -53,11 +53,6 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
 
     /**
      * Recherche des séances pour l'admin (3 filtres alignés sur la maquette ecran-15).
-     * <p>
-     * Subtilité Postgres : un LocalDate à null fait planter l'inférence de type.
-     * On passe TOUJOURS une date concrète + un booléen "filtrerDate" qui décide si la clause s'applique.
-     * Pour les Integer, le `IS NULL` fonctionne nativement.
-     * <p>
      * TODO post-MVP : ajouter Pageable pour la pagination quand le volume de séances le justifiera.
      */
     @Query("SELECT s FROM Seance s " +

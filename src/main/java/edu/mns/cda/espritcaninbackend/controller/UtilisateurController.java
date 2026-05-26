@@ -1,8 +1,8 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.espritcaninbackend.dao.UtilisateurDao;
 import edu.mns.cda.espritcaninbackend.model.Utilisateur;
+import edu.mns.cda.espritcaninbackend.service.UtilisateurService;
 import edu.mns.cda.espritcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.espritcaninbackend.view.UtilisateurView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,14 +23,14 @@ import java.util.Optional;
 @Tag(name = "Utilisateur", description = """
         API de gestion des utilisateurs du club esprit canin.
         Permet de récupérer, créer, modifier et supprimer des utilisateurs.
-        Toutes les réponses sont au format JSON.        
+        Toutes les réponses sont au format JSON.
         """)
 @RequiredArgsConstructor
 @RequestMapping("/utilisateur")
 @CrossOrigin
 public class UtilisateurController {
 
-    protected final UtilisateurDao utilisateurDao;
+    protected final UtilisateurService utilisateurService;
 
     @GetMapping("/list")
     @Operation(
@@ -49,7 +49,7 @@ public class UtilisateurController {
     })
     @JsonView(UtilisateurView.class)
     public List<Utilisateur> getAllUtilisateurs() {
-        return utilisateurDao.findAllOrderByNomPrenom();
+        return utilisateurService.findAll();
     }
 
     @GetMapping("/search")
@@ -71,9 +71,7 @@ public class UtilisateurController {
             @Parameter(description = "ID du rôle (Adherent, Coach, Admin)")
             @RequestParam(required = false) Integer roleId
     ) {
-        // Normalise null/blank en chaîne vide (LIKE '%%' matche tout, évite le bug Postgres bytea sur null)
-        String rechercheNormalisee = (recherche == null || recherche.isBlank()) ? "" : recherche.trim();
-        return utilisateurDao.search(rechercheNormalisee, roleId);
+        return utilisateurService.search(recherche, roleId);
     }
 
     @GetMapping("/{id}")
@@ -99,8 +97,7 @@ public class UtilisateurController {
             @Parameter(description = "Identifiant unique de l'utilisateur", required = true, example = "1")
             @PathVariable Integer id
     ) {
-
-        Optional<Utilisateur> optionalUtilisateur = utilisateurDao.findById(id);
+        Optional<Utilisateur> optionalUtilisateur = utilisateurService.findById(id);
 
         if (optionalUtilisateur.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -126,6 +123,10 @@ public class UtilisateurController {
             @ApiResponse(
                     responseCode = "400",
                     description = "Corps de la requête invalide ou champs manquants"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Email déjà utilisé"
             )
     })
     @JsonView(UtilisateurView.class)
@@ -136,10 +137,7 @@ public class UtilisateurController {
             @RequestBody
             @Validated(ValidationGroupe.OnCreate.class) Utilisateur utilisateurToInsert
     ) {
-
-        utilisateurToInsert.setId(null);
-
-        utilisateurDao.save(utilisateurToInsert);
+        utilisateurService.insert(utilisateurToInsert);
 
         return new ResponseEntity<>(utilisateurToInsert, HttpStatus.CREATED);
     }
@@ -149,8 +147,9 @@ public class UtilisateurController {
             summary = "Supprimer un utilisateur par son ID",
             description = """
                     Supprime définitivement l'utilisateur correspondant à l'ID passé en path variable.
-                    Retourne une erreur 404 si l'ID est introuvable en base.
-                    Retourne un statut 204 sans corps de réponse si la suppression est réussie.                    
+                    Refusé (409 Conflict) si l'utilisateur a encore des chiens enregistrés
+                    ou s'il est coach d'au moins une séance.
+                    Retourne 404 si l'ID est introuvable, 204 si la suppression est réussie.
                     """
     )
     @ApiResponses(value = {
@@ -161,20 +160,17 @@ public class UtilisateurController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Aucun utilisateur ne correspond à cet ID"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "L'utilisateur a encore des chiens ou des séances coachées"
             )
     })
-    public ResponseEntity<Utilisateur> deleteUtilisateur(
+    public ResponseEntity<Void> deleteUtilisateur(
             @Parameter(description = "Identifiant unique de l'utilisateur a supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
-
-        Optional<Utilisateur> optionalUtilisateur = utilisateurDao.findById(id);
-
-        if (optionalUtilisateur.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        utilisateurDao.deleteById(id);
+        utilisateurService.delete(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -187,7 +183,7 @@ public class UtilisateurController {
                     L'ID du corps JSON est écrasé par celui de l'URL pour éviter toute incohérence.
                     Retourne une erreur 404 si l'ID est introuvable en base.
                     Retourne un statut 204 sans corps de réponse si la mise à jour est réussie.
-                    Le password n'est pas modifiable via cet endpoint
+                    Le password n'est pas modifiable via cet endpoint (utiliser PATCH /utilisateur/{id}/password).
                     """
     )
     @ApiResponses(value = {
@@ -202,6 +198,9 @@ public class UtilisateurController {
             @ApiResponse(
                     responseCode = "400",
                     description = "Corps de la requête invalide ou champs manquants"
+            ),
+            @ApiResponse(
+                    responseCode = "409", description = "Email déjà utilisé"
             )
     })
     public ResponseEntity<Void> updateUtilisateur(
@@ -215,21 +214,7 @@ public class UtilisateurController {
             @Validated(ValidationGroupe.OnUpdate.class)
             Utilisateur utilisateurToUpdate
     ) {
-        Optional<Utilisateur> optionalUtilisateur = utilisateurDao.findById(id);
-
-        if (optionalUtilisateur.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        // On part de l'existant pour ne pas écraser les champs non modifiables (password, dateInscription).
-        Utilisateur existant = optionalUtilisateur.get();
-        existant.setNom(utilisateurToUpdate.getNom());
-        existant.setPrenom(utilisateurToUpdate.getPrenom());
-        existant.setEmail(utilisateurToUpdate.getEmail());
-        existant.setTelephone(utilisateurToUpdate.getTelephone());
-        existant.setRole(utilisateurToUpdate.getRole());
-
-        utilisateurDao.save(existant);
+        utilisateurService.update(id, utilisateurToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -245,30 +230,28 @@ public class UtilisateurController {
                     """
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Mot de passe mis à jour avec succès"),
-            @ApiResponse(responseCode = "404", description = "Aucun utilisateur ne correspond à cet ID"),
-            @ApiResponse(responseCode = "400", description = "Mot de passe trop court (min 8 caractères) ou manquant")
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Mot de passe mis à jour avec succès"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Aucun utilisateur ne correspond à cet ID"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Mot de passe trop court (min 8 caractères) ou manquant"
+            )
     })
     public ResponseEntity<Void> updatePassword(
             @Parameter(description = "Identifiant unique de l'utilisateur", required = true, example = "1")
             @PathVariable Integer id,
             @RequestBody PasswordUpdateRequest body
     ) {
-        if (body == null || body.password() == null || body.password().length() < 8) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        Optional<Utilisateur> optionalUtilisateur = utilisateurDao.findById(id);
-        if (optionalUtilisateur.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        Utilisateur existant = optionalUtilisateur.get();
-        // TODO Spring Security : hasher avec BCryptPasswordEncoder avant save.
-        existant.setPassword(body.password());
-        utilisateurDao.save(existant);
+        utilisateurService.updatePassword(id, body == null ? null : body.password());
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     public record PasswordUpdateRequest(String password) {}
 }
-

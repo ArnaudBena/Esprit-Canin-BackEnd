@@ -39,7 +39,7 @@ public class InscriptionService {
         }
 
         inscription.setId(key);
-        // TODO (étape séances) : valider l'âge du chien dans les bornes du TypeSeance,
+        // TODO: valider l'âge du chien dans les bornes du TypeSeance,
         //  la capacité de la séance non dépassée, et la séance non ANNULEE.
 
         inscriptionDao.save(inscription);

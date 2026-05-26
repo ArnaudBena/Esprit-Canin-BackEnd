@@ -17,10 +17,7 @@ public interface ChienDao extends JpaRepository<Chien, Integer> {
 
     /**
      * Recherche des chiens pour l'admin.
-     * - recherche : texte cherché dans nom chien, race.nom, nom/prénom propriétaire (case-insensitive).
-     *   Toujours non-null (chaîne vide = pas de filtre, LIKE '%%' matche tout).
-     * - sexe + filtrerSexe : Postgres ne sait pas inférer un enum null,
-     *   donc on passe TOUJOURS un sexe + un booléen "filtrerSexe" qui décide si la clause s'applique.
+     * - recherche : texte cherché dans nom chien, race.nom, nom/prénom propriétaire.
      */
     @Query("SELECT c FROM Chien c " +
             "WHERE (LOWER(c.nom) LIKE LOWER(CONCAT('%', :recherche, '%')) " +

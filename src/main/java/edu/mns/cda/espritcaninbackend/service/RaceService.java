@@ -52,7 +52,6 @@ public class RaceService {
                     "Cette race est utilisée par un ou plusieurs chiens, suppression impossible"
             );
         }
-
         raceDao.deleteById(id);
     }
 }

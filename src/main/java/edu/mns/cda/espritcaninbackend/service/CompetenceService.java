@@ -40,8 +40,6 @@ public class CompetenceService {
         if (competenceDao.findById(id).isEmpty()) {
             throw new CompetenceNotFoundException(id);
         }
-        // Si la compétence est référencée par un ChienCompetence,
-        // Postgres lèvera une DataIntegrityViolationException → handler global = 409 Conflict
         competenceDao.deleteById(id);
     }
 }

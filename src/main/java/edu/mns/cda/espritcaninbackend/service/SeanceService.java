@@ -35,9 +35,7 @@ public class SeanceService {
     }
 
     /**
-     * Recherche des séances pour l'admin (3 filtres alignés sur la maquette ecran-15).
-     * Pour contourner un bug Postgres + Hibernate (impossible d'inférer le type d'un LocalDate null),
-     * on passe toujours une date concrète au DAO + un booléen "filtrerDate" qui décide si la clause s'applique.
+     * Recherche des séances pour l'admin avec 3 filtres.
      */
     public List<Seance> search(Integer typeSeanceId,
                                LocalDate date,
