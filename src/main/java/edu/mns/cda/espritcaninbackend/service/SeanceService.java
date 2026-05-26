@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,19 @@ public class SeanceService {
 
     public List<Seance> findAll() {
         return seanceDao.findAllOrderByDateHeure();
+    }
+
+    /**
+     * Recherche des séances pour l'admin (3 filtres alignés sur la maquette ecran-15).
+     * Pour contourner un bug Postgres + Hibernate (impossible d'inférer le type d'un LocalDate null),
+     * on passe toujours une date concrète au DAO + un booléen "filtrerDate" qui décide si la clause s'applique.
+     */
+    public List<Seance> search(Integer typeSeanceId,
+                               LocalDate date,
+                               Integer coachId) {
+        boolean filtrerDate = (date != null);
+        LocalDate dateEffective = filtrerDate ? date : LocalDate.now(); // valeur bidon non utilisée si filtrerDate=false
+        return seanceDao.search(typeSeanceId, dateEffective, filtrerDate, coachId);
     }
 
     public void insert(Seance seance) {

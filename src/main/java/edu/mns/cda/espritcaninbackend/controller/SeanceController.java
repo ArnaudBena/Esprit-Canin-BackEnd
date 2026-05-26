@@ -11,11 +11,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +49,30 @@ public class SeanceController {
     @JsonView(SeanceView.class)
     public List<Seance> getAllSeances() {
         return seanceService.findAll();
+    }
+
+    @GetMapping("/search")
+    @Operation(
+            summary = "Rechercher des séances avec filtres",
+            description = """
+                    Retourne la liste filtrée des séances selon les 3 filtres optionnels (maquette ecran-15) :
+                    type de séance, date exacte, coach.
+                    Tri imposé serveur : date ASC, heureDebut ASC.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste filtrée retournée avec succès")
+    })
+    @JsonView(SeanceView.class)
+    public List<Seance> searchSeances(
+            @Parameter(description = "ID du type de séance")
+            @RequestParam(required = false) Integer typeSeanceId,
+            @Parameter(description = "Date exacte (yyyy-MM-dd)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @Parameter(description = "ID du coach assigné")
+            @RequestParam(required = false) Integer coachId
+    ) {
+        return seanceService.search(typeSeanceId, date, coachId);
     }
 
     @GetMapping("/{id}")

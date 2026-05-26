@@ -50,4 +50,23 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
             "ORDER BY s.date ASC, s.heureDebut ASC")
     List<Seance> findByStatutDepuis(@Param("today") LocalDate today,
                                     @Param("statut") StatutSeance statut);
+
+    /**
+     * Recherche des séances pour l'admin (3 filtres alignés sur la maquette ecran-15).
+     * <p>
+     * Subtilité Postgres : un LocalDate à null fait planter l'inférence de type.
+     * On passe TOUJOURS une date concrète + un booléen "filtrerDate" qui décide si la clause s'applique.
+     * Pour les Integer, le `IS NULL` fonctionne nativement.
+     * <p>
+     * TODO post-MVP : ajouter Pageable pour la pagination quand le volume de séances le justifiera.
+     */
+    @Query("SELECT s FROM Seance s " +
+            "WHERE (:typeSeanceId IS NULL OR s.typeSeance.id = :typeSeanceId) " +
+            "AND (:filtrerDate = FALSE OR s.date = :date) " +
+            "AND (:coachId IS NULL OR s.coach.id = :coachId) " +
+            "ORDER BY s.date ASC, s.heureDebut ASC")
+    List<Seance> search(@Param("typeSeanceId") Integer typeSeanceId,
+                        @Param("date") LocalDate date,
+                        @Param("filtrerDate") boolean filtrerDate,
+                        @Param("coachId") Integer coachId);
 }
