@@ -2,8 +2,8 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.espritcaninbackend.dao.RaceDao;
 import edu.mns.cda.espritcaninbackend.model.Race;
+import edu.mns.cda.espritcaninbackend.service.RaceService;
 import edu.mns.cda.espritcaninbackend.view.RaceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +30,7 @@ import java.util.Optional;
 @CrossOrigin
 public class RaceController {
 
-    protected final RaceDao raceDao;
+    protected final RaceService raceService;
 
     @GetMapping("/list")
     @Operation(
@@ -49,7 +49,7 @@ public class RaceController {
     })
     @JsonView(RaceView.class)
     public List<Race> getAllRaces() {
-        return raceDao.findAllOrderByNom();
+        return raceService.findAll();
     }
 
     @GetMapping("/{id}")
@@ -76,7 +76,7 @@ public class RaceController {
             @PathVariable Integer id
     ) {
 
-        Optional<Race> optionalRace = raceDao.findById(id);
+        Optional<Race> optionalRace = raceService.findById(id);
 
         if(optionalRace.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -112,10 +112,7 @@ public class RaceController {
             @RequestBody
             @Valid Race raceToInsert
     ) {
-
-        raceToInsert.setId(null);
-
-        raceDao.save(raceToInsert);
+        raceService.insert(raceToInsert);
 
         return new ResponseEntity<>(raceToInsert, HttpStatus.CREATED);
     }
@@ -137,20 +134,17 @@ public class RaceController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Aucune race ne correspond à cet ID"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Race utilisée par un ou plusieurs chiens"
             )
     })
-    public ResponseEntity<Race> deleteRace(
+    public ResponseEntity<Void> deleteRace(
             @Parameter(description = "Identifiant unique de la race à supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
-
-        Optional<Race> optionalRace = raceDao.findById(id);
-
-        if(optionalRace.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        raceDao.deleteById(id);
+        raceService.delete(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -190,16 +184,7 @@ public class RaceController {
             @Valid
             Race raceToUpdate) {
 
-        Optional<Race> optionalRace = raceDao.findById(id);
-
-        if(optionalRace.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        // On écrase l'id du json par celui en paramètre
-        raceToUpdate.setId(id);
-
-        raceDao.save(raceToUpdate);
+        raceService.update(id, raceToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

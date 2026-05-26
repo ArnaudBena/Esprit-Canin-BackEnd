@@ -32,4 +32,11 @@ public interface ChienDao extends JpaRepository<Chien, Integer> {
     List<Chien> search(@Param("recherche") String recherche,
                        @Param("sexe") Sexe sexe,
                        @Param("filtrerSexe") boolean filtrerSexe);
+
+    /**
+     * Compte le nombre de chiens qui utilisent la race donnée.
+     * Utilisé par RaceService.delete pour bloquer la suppression d'une race référencée.
+     */
+    @Query("SELECT COUNT(c) FROM Chien c WHERE c.race.id = :raceId")
+    long countByRaceId(@Param("raceId") Integer raceId);
 }

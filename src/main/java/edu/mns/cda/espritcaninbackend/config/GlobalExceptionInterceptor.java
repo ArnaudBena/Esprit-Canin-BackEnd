@@ -95,5 +95,4 @@ public class GlobalExceptionInterceptor {
                 .status(ex.getStatusCode())
                 .body(Map.of("erreur", message));
     }
-
 }
