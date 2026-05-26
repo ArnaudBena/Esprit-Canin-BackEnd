@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UtilisateurDao extends JpaRepository<Utilisateur, Integer> {
@@ -37,4 +38,12 @@ public interface UtilisateurDao extends JpaRepository<Utilisateur, Integer> {
      */
     @Query("SELECT COUNT(u) FROM Utilisateur u WHERE u.dateInscription >= :debut ")
     long countNouveauxDepuis(@Param("debut") LocalDate debut);
+
+    /**
+     * Récupère un utilisateur par son email. Utilisé par UtilisateurDetailsService
+     * pour le login (Spring Security identifie un user par son "username" = email dans mon projet).
+     * Decouverte des Derived query suite au cours: Spring Data JPA génère le SQL automatiquement depuis le nom de la méthode.
+     * Uniquement pour les requetes simples : SELECT * FROM utilisateur WHERE email = ?
+     */
+    Optional<Utilisateur> findByEmail(String email);
 }

@@ -156,9 +156,18 @@ public class ChienController {
                     """
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Chien mis à jour avec succès, aucun contenu retourné"),
-            @ApiResponse(responseCode = "404", description = "Aucun chien ne correspond à cet ID"),
-            @ApiResponse(responseCode = "400", description = "Corps de la requête invalide ou champs manquants")
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Chien mis à jour avec succès, aucun contenu retourné"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Aucun chien ne correspond à cet ID"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Corps de la requête invalide ou champs manquants"
+            )
     })
     public ResponseEntity<Void> updateChien(
             @Parameter(description = "Identifiant unique du chien à mettre à jour", required = true, example = "1")
