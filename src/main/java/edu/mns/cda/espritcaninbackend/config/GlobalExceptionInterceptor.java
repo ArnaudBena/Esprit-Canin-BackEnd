@@ -1,8 +1,6 @@
 package edu.mns.cda.espritcaninbackend.config;
 
-import edu.mns.cda.espritcaninbackend.exception.InscriptionNotFoundException;
-import edu.mns.cda.espritcaninbackend.exception.RoleNotFoundException;
-import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
+import edu.mns.cda.espritcaninbackend.exception.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +14,14 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Gestionnaire global d'exceptions pour transformer les exceptions Java en réponses HTTP propres.
+ *
+ * Convention du projet : exceptions UNCHECKED (héritent de RuntimeException)
+ * Toutes les exceptions custom du projet (XxxNotFoundException) héritent de RuntimeException.
+ *  - Pas besoin de `throws XxxException` dans toutes les signatures de méthodes.
+ *  - Les exceptions remontent naturellement jusqu'à ce @RestControllerAdvice qui les mappe en HTTP.
+ */
 @RestControllerAdvice
 public class GlobalExceptionInterceptor {
 
@@ -37,7 +43,6 @@ public class GlobalExceptionInterceptor {
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> constraintViolationDatabase(DataIntegrityViolationException ex) {
 
-
         return Map.of("erreur", "Erreur de contrainte dans la base de données");
     }
 
@@ -53,6 +58,36 @@ public class GlobalExceptionInterceptor {
         return Map.of("erreur", ex.getMessage());
     }
 
+    @ExceptionHandler(RoleNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> roleNotFound(RoleNotFoundException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(RaceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> raceNotFound(RaceNotFoundException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(CompetenceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> competenceNotFound(CompetenceNotFoundException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(ChienNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> chienNotFound(ChienNotFoundException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(UtilisateurNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> utilisateurNotFound(UtilisateurNotFoundException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> responseStatusException(ResponseStatusException ex) {
         String message = ex.getReason() != null ? ex.getReason() : "Erreur";
@@ -61,9 +96,4 @@ public class GlobalExceptionInterceptor {
                 .body(Map.of("erreur", message));
     }
 
-    @ExceptionHandler(RoleNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> roleNotFound(RoleNotFoundException ex) {
-        return Map.of("erreur", ex.getMessage());
-    }
 }
