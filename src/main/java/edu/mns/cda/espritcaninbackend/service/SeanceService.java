@@ -30,7 +30,7 @@ public class SeanceService {
     }
 
     public List<Seance> findAll() {
-        return seanceDao.findAll();
+        return seanceDao.findAllOrderByDateHeure();
     }
 
     public void insert(Seance seance) {

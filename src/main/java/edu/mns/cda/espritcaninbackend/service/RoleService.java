@@ -16,7 +16,7 @@ public class RoleService {
     protected final RoleDao roleDao;
 
     public List<Role> findAll() {
-        return roleDao.findAll();
+        return roleDao.findAllOrderByNom();
     }
 
     public Optional<Role> findById(int id) {

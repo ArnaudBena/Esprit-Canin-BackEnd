@@ -48,7 +48,7 @@ public class CompetenceController {
     })
     @JsonView(CompetenceView.class)
     public List<Competence> getAllCompetences() {
-        return competenceDao.findAll();
+        return competenceDao.findAllOrderByNom();
     }
 
     @GetMapping("/{id}")

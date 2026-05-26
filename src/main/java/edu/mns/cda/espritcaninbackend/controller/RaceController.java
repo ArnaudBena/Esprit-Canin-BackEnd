@@ -49,7 +49,7 @@ public class RaceController {
     })
     @JsonView(RaceView.class)
     public List<Race> getAllRaces() {
-        return raceDao.findAll();
+        return raceDao.findAllOrderByNom();
     }
 
     @GetMapping("/{id}")

@@ -7,9 +7,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface UtilisateurDao extends JpaRepository<Utilisateur, Integer> {
+
+    /**
+     * Retourne tous les utilisateurs triés alphabétiquement (nom puis prénom).
+     */
+    @Query("SELECT u FROM Utilisateur u ORDER BY u.nom ASC, u.prenom ASC")
+    List<Utilisateur> findAllOrderByNomPrenom();
 
     /**
      * Compte les utilisateurs inscrits depuis la date donnée.

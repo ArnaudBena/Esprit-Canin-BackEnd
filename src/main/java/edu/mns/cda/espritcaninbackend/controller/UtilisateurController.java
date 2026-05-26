@@ -49,7 +49,7 @@ public class UtilisateurController {
     })
     @JsonView(UtilisateurView.class)
     public List<Utilisateur> getAllUtilisateurs() {
-        return utilisateurDao.findAll();
+        return utilisateurDao.findAllOrderByNomPrenom();
     }
 
     @GetMapping("/{id}")

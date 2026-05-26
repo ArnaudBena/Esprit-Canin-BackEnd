@@ -14,7 +14,20 @@ import java.util.List;
 @Repository
 public interface SeanceDao extends JpaRepository<Seance, Integer> {
 
-    List<Seance> findByCoachAndDate(Utilisateur coach, LocalDate date);
+    /**
+     * Séances d'un coach à une date donnée.
+     * Utilisé par la validation de chevauchement dans SeanceService.
+     */
+    @Query("SELECT s FROM Seance s WHERE s.coach = :coach AND s.date = :date")
+    List<Seance> findByCoachAndDate(@Param("coach") Utilisateur coach,
+                                    @Param("date") LocalDate date);
+
+    /**
+     * Toutes les séances triées par date ASC puis heureDebut ASC.
+     * Utilisé pour le listing admin.
+     */
+    @Query("SELECT s FROM Seance s ORDER BY s.date ASC, s.heureDebut ASC")
+    List<Seance> findAllOrderByDateHeure();
 
     /**
      * Compte les séances comprises dans un interval de dates (bornes incluses), filtrées par statut.

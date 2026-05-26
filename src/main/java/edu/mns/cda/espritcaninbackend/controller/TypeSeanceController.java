@@ -45,7 +45,7 @@ public class TypeSeanceController {
     })
     @JsonView(TypeSeanceView.class)
     public List<TypeSeance> getAllTypesSeance() {
-        return typeSeanceDao.findAll();
+        return typeSeanceDao.findAllOrderByLibelle();
     }
 
     @GetMapping("/{id}")

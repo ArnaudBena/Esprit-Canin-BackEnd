@@ -47,7 +47,7 @@ public class ChienController {
     })
     @JsonView(ChienView.class)
     public List<Chien> getAllChiens() {
-        return chienDao.findAll();
+        return chienDao.findAllOrderByNom();
     }
 
     @GetMapping("/{id}")
