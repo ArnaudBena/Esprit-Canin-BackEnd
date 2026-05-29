@@ -1,7 +1,9 @@
 package edu.mns.cda.espritcaninbackend.service;
 
+import edu.mns.cda.espritcaninbackend.dao.RoleDao;
 import edu.mns.cda.espritcaninbackend.dao.UtilisateurDao;
 import edu.mns.cda.espritcaninbackend.exception.UtilisateurNotFoundException;
+import edu.mns.cda.espritcaninbackend.model.Role;
 import edu.mns.cda.espritcaninbackend.model.Utilisateur;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ public class UtilisateurService {
 
     protected final UtilisateurDao utilisateurDao;
     protected final PasswordEncoder passwordEncoder;
+    protected final RoleDao roleDao;
 
     public List<Utilisateur> findAll() {
         return utilisateurDao.findAllOrderByNomPrenom();
@@ -102,5 +105,20 @@ public class UtilisateurService {
         }
 
         utilisateurDao.deleteById(id);
+    }
+
+    /**
+     * Inscription publique : Crée un utilisateur en lui forçant le role Adhrent. J'ignore volontairement tout role envoyé par le client
+     * Sinon n'importe qui pourrais s'auto déclarer Coach ou Admin
+     * Hash du password avec insert
+     */
+    public void inscriptionPublique(Utilisateur utilisateur) {
+        Role adherent = roleDao.findByNom("Adherent")
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Rôle 'Adherent' introuvable en base."
+                ));
+        utilisateur.setRole(adherent);
+        insert(utilisateur); // setId(null) + hash password + save
     }
 }
