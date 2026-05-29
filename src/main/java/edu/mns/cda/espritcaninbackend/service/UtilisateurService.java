@@ -5,6 +5,7 @@ import edu.mns.cda.espritcaninbackend.exception.UtilisateurNotFoundException;
 import edu.mns.cda.espritcaninbackend.model.Utilisateur;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class UtilisateurService {
 
     protected final UtilisateurDao utilisateurDao;
+    protected final PasswordEncoder passwordEncoder;
 
     public List<Utilisateur> findAll() {
         return utilisateurDao.findAllOrderByNomPrenom();
@@ -35,7 +37,7 @@ public class UtilisateurService {
 
     public void insert(Utilisateur utilisateur) {
         utilisateur.setId(null);
-        // TODO Spring Security : hasher password avec BCryptPasswordEncoder avant save.
+        utilisateur.setPassword(passwordEncoder.encode(utilisateur.getPassword()));
         utilisateurDao.save(utilisateur);
     }
 
@@ -71,8 +73,7 @@ public class UtilisateurService {
         Utilisateur existant = utilisateurDao.findById(id)
                 .orElseThrow(() -> new UtilisateurNotFoundException(id));
 
-        // TODO Spring Security : hasher avec BCryptPasswordEncoder avant save.
-        existant.setPassword(nouveauPassword);
+        existant.setPassword(passwordEncoder.encode(nouveauPassword));
         utilisateurDao.save(existant);
     }
 
