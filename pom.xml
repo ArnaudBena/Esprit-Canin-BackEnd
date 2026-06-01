@@ -10,7 +10,7 @@
     </parent>
     <groupId>edu.mns.cda</groupId>
     <artifactId>Esprit-Canin-BackEnd</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>Esprit-Canin-BackEnd</name>
     <description>Esprit-Canin-BackEnd</description>
     <url/>
