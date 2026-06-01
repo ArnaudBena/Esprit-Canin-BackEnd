@@ -27,6 +27,9 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
+
+    - name: rename .example.env to .env
+      run: mv .example.env .env
+      
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-      
