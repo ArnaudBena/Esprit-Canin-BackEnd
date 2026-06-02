@@ -2,6 +2,7 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.dto.DashboardDto;
+import edu.mns.cda.espritcaninbackend.security.IsAdmin;
 import edu.mns.cda.espritcaninbackend.service.DashboardService;
 import edu.mns.cda.espritcaninbackend.view.SeanceView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/admin/dashboard")
 @CrossOrigin
+@IsAdmin
 public class DashboardController {
 
     protected final DashboardService dashboardService;

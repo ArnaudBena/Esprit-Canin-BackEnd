@@ -2,6 +2,7 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.model.Inscription;
+import edu.mns.cda.espritcaninbackend.security.IsAdmin;
 import edu.mns.cda.espritcaninbackend.service.InscriptionService;
 import edu.mns.cda.espritcaninbackend.view.InscriptionView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/inscription")
 @CrossOrigin
+@IsAdmin
 public class InscriptionController {
 
     protected final InscriptionService inscriptionService;

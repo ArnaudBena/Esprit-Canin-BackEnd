@@ -2,6 +2,7 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.model.Utilisateur;
+import edu.mns.cda.espritcaninbackend.security.IsAdmin;
 import edu.mns.cda.espritcaninbackend.service.UtilisateurService;
 import edu.mns.cda.espritcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.espritcaninbackend.view.UtilisateurView;
@@ -28,6 +29,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/utilisateur")
 @CrossOrigin
+@IsAdmin
 public class UtilisateurController {
 
     protected final UtilisateurService utilisateurService;

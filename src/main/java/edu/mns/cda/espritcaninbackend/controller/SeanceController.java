@@ -1,6 +1,7 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.espritcaninbackend.security.IsAdmin;
 import edu.mns.cda.espritcaninbackend.service.SeanceService;
 import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.utile.ValidationGroupe;
@@ -30,6 +31,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/seance")
 @CrossOrigin
+@IsAdmin
 public class SeanceController {
 
     protected final SeanceService seanceService;

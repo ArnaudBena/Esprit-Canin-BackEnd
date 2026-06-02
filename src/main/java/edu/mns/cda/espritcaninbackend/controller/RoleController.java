@@ -2,6 +2,7 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.model.Role;
+import edu.mns.cda.espritcaninbackend.security.IsAdmin;
 import edu.mns.cda.espritcaninbackend.service.RoleService;
 import edu.mns.cda.espritcaninbackend.view.RoleView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/role")
 @CrossOrigin
+@IsAdmin
 public class RoleController {
 
     protected final RoleService roleService;

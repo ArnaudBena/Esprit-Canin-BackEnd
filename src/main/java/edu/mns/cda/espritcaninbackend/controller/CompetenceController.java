@@ -2,6 +2,7 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.model.Competence;
+import edu.mns.cda.espritcaninbackend.security.IsAdmin;
 import edu.mns.cda.espritcaninbackend.service.CompetenceService;
 import edu.mns.cda.espritcaninbackend.view.CompetenceView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/competence")
 @CrossOrigin
+@IsAdmin
 public class CompetenceController {
 
     protected final CompetenceService competenceService;

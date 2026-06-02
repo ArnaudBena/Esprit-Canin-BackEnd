@@ -3,6 +3,7 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.model.Race;
+import edu.mns.cda.espritcaninbackend.security.IsAdmin;
 import edu.mns.cda.espritcaninbackend.service.RaceService;
 import edu.mns.cda.espritcaninbackend.view.RaceView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +29,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/race")
 @CrossOrigin
+@IsAdmin
 public class RaceController {
 
     protected final RaceService raceService;

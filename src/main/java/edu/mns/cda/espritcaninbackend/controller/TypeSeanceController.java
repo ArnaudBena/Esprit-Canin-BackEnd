@@ -3,6 +3,7 @@ package edu.mns.cda.espritcaninbackend.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.dao.TypeSeanceDao;
 import edu.mns.cda.espritcaninbackend.model.TypeSeance;
+import edu.mns.cda.espritcaninbackend.security.IsAdmin;
 import edu.mns.cda.espritcaninbackend.view.TypeSeanceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/typeSeance")
 @CrossOrigin
+@IsAdmin
 public class TypeSeanceController {
 
     protected final TypeSeanceDao typeSeanceDao;

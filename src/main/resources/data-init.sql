@@ -37,12 +37,12 @@ INSERT INTO competence (nom, description) VALUES
 -- Utilisateurs
 -- NB: password en clair pour l'instant, le hash arrivera avec Spring Security
 INSERT INTO utilisateur (nom, prenom, email, password, date_inscription, telephone, id_role) VALUES
-    ('Dupont', 'Jean', 'jean.dupont@mail.fr', 'motdepasse123', '2025-01-15', '0612345678', 1),
-    ('Martin', 'Sophie', 'sophie.martin@mail.fr', 'motdepasse123', '2025-02-03', '0687654321', 1),
-    ('Bernard', 'Lucas', 'lucas.bernard@mail.fr', 'motdepasse123', '2024-11-20', NULL, 2),
-    ('Lefevre', 'Claire', 'claire.lefevre@mail.fr', 'motdepasse123', '2024-09-10', '0654321987', 3),
-    ('Petit', 'Camille', 'camille.petit@mail.fr', 'motdepasse123', '2024-10-15', '0698765432', 2),
-    ('Garcia', 'Thomas', 'thomas.garcia@mail.fr', 'motdepasse123', '2025-03-01', NULL, 2);
+    ('Dupont', 'Jean', 'jean.dupont@mail.fr', '$2a$10$PFY2p1BU.cwA21ntAeooiOe/jzj/b5rDy7/Gj1ffCoALXDNxrjG/O', '2025-01-15', '0612345678', 1),
+    ('Martin', 'Sophie', 'sophie.martin@mail.fr', '$2a$10$BXz2NIDGJoZMeXSsF4tKKeZ7rhLILGp1v7un7Ia.ZAHHBlDx9hl3K', '2025-02-03', '0687654321', 1),
+    ('Bernard', 'Lucas', 'lucas.bernard@mail.fr', '$2a$10$uEhqX3Qp7wr9f1EzGxLsre/FVE3N.ExM.NfbJe71r1qzMBvddoHJi', '2024-11-20', NULL, 2),
+    ('Lefevre', 'Claire', 'claire.lefevre@mail.fr', '$2a$10$A0PmjID9zgnVfju6cYjwIuzWuUlXuXCQTWCNEsfSB.I75Zk4gHAmK', '2024-09-10', '0654321987', 3),
+    ('Petit', 'Camille', 'camille.petit@mail.fr', '$2a$10$FO4A91.0qKGGubBp7wEuUewShz4LsK9oN.DUligI5hKCGezdi7DHi', '2024-10-15', '0698765432', 2),
+    ('Garcia', 'Thomas', 'thomas.garcia@mail.fr', '$2a$10$ro2GKvinxjtPhZAD99AtuezvYhOVUWq6oQ5s.iLCHq9z7j7JhQS/e', '2025-03-01', NULL, 2);
 
 -- Chiens
 INSERT INTO chien (nom, poids, taille, sexe, date_naissance, numero_puce, id_utilisateur, id_race) VALUES
