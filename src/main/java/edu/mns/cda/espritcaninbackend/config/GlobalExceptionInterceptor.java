@@ -95,4 +95,40 @@ public class GlobalExceptionInterceptor {
                 .status(ex.getStatusCode())
                 .body(Map.of("erreur", message));
     }
+
+    @ExceptionHandler(InscriptionDoublonException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> inscriptionDoublon(InscriptionDoublonException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(SeanceAnnuleeException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> seanceAnnulee(SeanceAnnuleeException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(SeancePasseeException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> seancePassee(SeancePasseeException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(SeanceCompleteException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> seanceComplete(SeanceCompleteException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(EligibiliteAgeException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> eligibiliteAge(EligibiliteAgeException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(EligibiliteCompetenceException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String, String> eligibiliteCompetence(EligibiliteCompetenceException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
 }

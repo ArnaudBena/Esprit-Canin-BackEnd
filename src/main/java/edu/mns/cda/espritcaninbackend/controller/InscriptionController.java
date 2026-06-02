@@ -97,9 +97,9 @@ public class InscriptionController {
             @RequestBody
             @Valid Inscription inscriptionToInsert
     ) {
-        inscriptionService.insert(inscriptionToInsert);
+        Inscription inscriptionCreee = inscriptionService.insert(inscriptionToInsert);
 
-        return new ResponseEntity<>(inscriptionToInsert, HttpStatus.CREATED);
+        return new ResponseEntity<>(inscriptionCreee, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{idChien}/{idSeance}")
