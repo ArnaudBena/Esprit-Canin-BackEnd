@@ -193,7 +193,7 @@ public class SeanceController {
     }
 
     // ===================================================================
-    // Catalogue adhérent (écrans 07 & 08) : séances à venir + ACTIVE.
+    // Catalogue adhérent : séances à venir + ACTIVE.
     // Réponse via DTO restreint (aucune fuite des inscrits). Filtrage serveur.
     // ===================================================================
 

@@ -79,9 +79,10 @@ INSERT INTO type_seance (libelle, description, age_minimum_mois, age_maximum_moi
 
 -- Séances
 INSERT INTO seance (date, heure_debut, duree_minutes, statut, id_type_seance, id_coach) VALUES
-    ('2026-05-10', '10:00:00', 60, 'ACTIVE', 1, 3),
+    ('2027-05-10', '10:00:00', 60, 'ACTIVE', 1, 3),
     ('2026-05-15', '14:00:00', 90, 'ACTIVE', 2, 3),
-    ('2026-05-20', '09:30:00', 60, 'ACTIVE', 3, 3);
+    ('2027-05-15', '14:00:00', 90, 'ACTIVE', 2, 3),
+    ('2027-05-20', '09:30:00', 60, 'ACTIVE', 3, 3);
 
 -- Inscriptions (chien → séance)
 -- Rex (chien 1) et Luna (chien 2) s'inscrivent à la séance 1 (Obéissance)

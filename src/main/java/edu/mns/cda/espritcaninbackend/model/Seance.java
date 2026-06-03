@@ -56,7 +56,7 @@ public class Seance {
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @JoinColumn(name = "id_type_seance", nullable = false)
-    @JsonView({SeanceView.class, ChienView.class})
+    @JsonView({SeanceView.class, ChienView.class, InscriptionView.class})
     protected TypeSeance typeSeance;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})

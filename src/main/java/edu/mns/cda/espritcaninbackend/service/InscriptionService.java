@@ -6,8 +6,10 @@ import edu.mns.cda.espritcaninbackend.dao.SeanceDao;
 import edu.mns.cda.espritcaninbackend.exception.*;
 import edu.mns.cda.espritcaninbackend.model.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -127,5 +129,31 @@ public class InscriptionService {
         }
         inscriptionToUpdate.setId(key);
         inscriptionDao.save(inscriptionToUpdate);
+    }
+
+    /**
+     * Inscriptions d'un propriétaire (tous ses chiens). Espace adhérent.
+     */
+    public List<Inscription> findByProprietaire(int utilisateurId) {
+        return inscriptionDao.findByProprietaire(utilisateurId);
+    }
+
+    /**
+     * Annulation par l'adhérent : passage en ANNULEE (soft delete, conserve l'historique).
+     * Refusé (409) si la séance est déjà passée.
+     */
+    public void annuler(Inscription.Key key) {
+        Inscription inscription = inscriptionDao.findById(key)
+                .orElseThrow(() -> new InscriptionNotFoundException(key.getChienId(), key.getSeanceId()));
+
+        if (inscription.getSeance().getDate().isBefore(LocalDate.now())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Impossible d'annuler l'inscription : la séance est déjà passée."
+            );
+        }
+
+        inscription.setStatutPresence(StatutPresence.ANNULEE);
+        inscriptionDao.save(inscription);
     }
 }
