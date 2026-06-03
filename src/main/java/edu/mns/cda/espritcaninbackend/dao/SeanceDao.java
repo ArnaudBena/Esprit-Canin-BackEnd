@@ -1,6 +1,8 @@
 package edu.mns.cda.espritcaninbackend.dao;
 
+import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDTO;
 import edu.mns.cda.espritcaninbackend.model.Seance;
+import edu.mns.cda.espritcaninbackend.model.StatutPresence;
 import edu.mns.cda.espritcaninbackend.model.StatutSeance;
 import edu.mns.cda.espritcaninbackend.model.Utilisateur;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SeanceDao extends JpaRepository<Seance, Integer> {
@@ -64,4 +67,54 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
                         @Param("date") LocalDate date,
                         @Param("filtrerDate") boolean filtrerDate,
                         @Param("coachId") Integer coachId);
+
+    /**
+     * Catalogue adhérent : séances à venir et ACTIVE, projetées dans un DTO
+     * restreint (aucune fuite des inscrits). Filtrage 100% serveur.
+     * Les places sont calculées via une sous-requête COUNT des inscriptions non annulées.
+     */
+    @Query("""
+            SELECT new edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDTO(
+                s.id, s.date, s.heureDebut, s.dureeMinutes, s.statut,
+                s.typeSeance.id, s.typeSeance.libelle, s.typeSeance.description,
+                s.typeSeance.ageMinimumMois, s.typeSeance.ageMaximumMois,
+                s.coach.id, s.coach.nom, s.coach.prenom,
+                s.typeSeance.participantsMaximum,
+                (SELECT COUNT(i) FROM Inscription i WHERE i.seance = s AND i.statutPresence <> :annulee)
+            )
+            FROM Seance s
+            WHERE s.date >= :today
+              AND s.statut = :active
+              AND (:typeSeanceId IS NULL OR s.typeSeance.id = :typeSeanceId)
+              AND (:filtrerDate = FALSE OR s.date = :date)
+              AND (:disponible IS NULL
+                   OR (:disponible = TRUE  AND (SELECT COUNT(i) FROM Inscription i WHERE i.seance = s AND i.statutPresence <> :annulee) <  s.typeSeance.participantsMaximum)
+                   OR (:disponible = FALSE AND (SELECT COUNT(i) FROM Inscription i WHERE i.seance = s AND i.statutPresence <> :annulee) >= s.typeSeance.participantsMaximum))
+            ORDER BY s.date ASC, s.heureDebut ASC
+            """)
+    List<SeanceCatalogueDTO> catalogue(@Param("today") LocalDate today,
+                                       @Param("active") StatutSeance active,
+                                       @Param("annulee") StatutPresence annulee,
+                                       @Param("typeSeanceId") Integer typeSeanceId,
+                                       @Param("date") LocalDate date,
+                                       @Param("filtrerDate") boolean filtrerDate,
+                                       @Param("disponible") Boolean disponible);
+
+    /**
+     * Détail catalogue d'une séance, même projection DTO restreinte.
+     */
+    @Query("""
+            SELECT new edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDTO(
+                s.id, s.date, s.heureDebut, s.dureeMinutes, s.statut,
+                s.typeSeance.id, s.typeSeance.libelle, s.typeSeance.description,
+                s.typeSeance.ageMinimumMois, s.typeSeance.ageMaximumMois,
+                s.coach.id, s.coach.nom, s.coach.prenom,
+                s.typeSeance.participantsMaximum,
+                (SELECT COUNT(i) FROM Inscription i WHERE i.seance = s AND i.statutPresence <> :annulee)
+            )
+            FROM Seance s
+            WHERE s.id = :id
+            """)
+    Optional<SeanceCatalogueDTO> catalogueById(@Param("id") Integer id,
+                                               @Param("annulee") StatutPresence annulee);
 }
