@@ -3,7 +3,7 @@ package edu.mns.cda.espritcaninbackend.service;
 import edu.mns.cda.espritcaninbackend.dao.SeanceDao;
 import edu.mns.cda.espritcaninbackend.dao.TypeSeanceDao;
 import edu.mns.cda.espritcaninbackend.dao.UtilisateurDao;
-import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDTO;
+import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
 import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
 import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.model.StatutPresence;
@@ -51,7 +51,7 @@ public class SeanceService {
      * Catalogue adhérent (écran 07) : séances à venir + ACTIVE, filtrées côté serveur.
      * @param disponible NULL = toutes, TRUE = avec places, FALSE = complètes
      */
-    public List<SeanceCatalogueDTO> catalogue(Integer typeSeanceId, LocalDate date, Boolean disponible) {
+    public List<SeanceCatalogueDto> catalogue(Integer typeSeanceId, LocalDate date, Boolean disponible) {
         boolean filtrerDate = (date != null);
         LocalDate dateEffective = filtrerDate ? date : LocalDate.now(); // valeur ignorée si filtrerDate=false
         return seanceDao.catalogue(LocalDate.now(), StatutSeance.ACTIVE, StatutPresence.ANNULEE,
@@ -61,7 +61,7 @@ public class SeanceService {
     /**
      * Détail catalogue d'une séance (écran 08).
      */
-    public Optional<SeanceCatalogueDTO> catalogueDetail(int id) {
+    public Optional<SeanceCatalogueDto> catalogueDetail(int id) {
         return seanceDao.catalogueById(id, StatutPresence.ANNULEE);
     }
 

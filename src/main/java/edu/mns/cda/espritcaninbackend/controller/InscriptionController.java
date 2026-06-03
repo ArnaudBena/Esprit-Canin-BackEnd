@@ -1,6 +1,7 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.espritcaninbackend.dto.InscriptionRequestDto;
 import edu.mns.cda.espritcaninbackend.model.Chien;
 import edu.mns.cda.espritcaninbackend.model.Inscription;
 import edu.mns.cda.espritcaninbackend.security.IsAdherent;
@@ -99,13 +100,9 @@ public class InscriptionController {
     @JsonView(InscriptionView.class)
     @IsAdmin
     public ResponseEntity<Inscription> create(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Objet Inscription à créer. La clé est déduite des id du chien et de la séance."
-            )
-            @RequestBody
-            @Valid Inscription inscriptionToInsert
+            @RequestBody @Valid InscriptionRequestDto request
     ) {
-        Inscription inscriptionCreee = inscriptionService.insert(inscriptionToInsert);
+        Inscription inscriptionCreee = inscriptionService.inscrire(request.chienId(), request.seanceId());
 
         return new ResponseEntity<>(inscriptionCreee, HttpStatus.CREATED);
     }
@@ -207,14 +204,9 @@ public class InscriptionController {
     @JsonView(InscriptionView.class)
     public ResponseEntity<Inscription> inscrireMonChien(
             @AuthenticationPrincipal UtilisateurDetails userDetails,
-            @RequestBody @Valid Inscription inscriptionToInsert
+            @RequestBody @Valid InscriptionRequestDto request
     ) {
-        Integer chienId = (inscriptionToInsert.getChien() == null) ? null : inscriptionToInsert.getChien().getId();
-        if (chienId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        Optional<Chien> optionalChien = chienService.findById(chienId);
+        Optional<Chien> optionalChien = chienService.findById(request.chienId());
         if (optionalChien.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -223,7 +215,7 @@ public class InscriptionController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        Inscription inscriptionCreee = inscriptionService.insert(inscriptionToInsert);
+        Inscription inscriptionCreee = inscriptionService.inscrire(request.chienId(), request.seanceId());
         return new ResponseEntity<>(inscriptionCreee, HttpStatus.CREATED);
     }
 

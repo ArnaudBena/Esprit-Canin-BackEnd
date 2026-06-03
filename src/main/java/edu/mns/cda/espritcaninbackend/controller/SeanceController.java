@@ -1,7 +1,7 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDTO;
+import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
 import edu.mns.cda.espritcaninbackend.security.IsAdherent;
 import edu.mns.cda.espritcaninbackend.security.IsAdmin;
 import edu.mns.cda.espritcaninbackend.service.SeanceService;
@@ -211,7 +211,7 @@ public class SeanceController {
             @ApiResponse(responseCode = "200", description = "Catalogue retourné avec succès")
     })
     @IsAdherent
-    public List<SeanceCatalogueDTO> getCatalogue(
+    public List<SeanceCatalogueDto> getCatalogue(
             @Parameter(description = "ID du type de séance")
             @RequestParam(required = false) Integer typeSeanceId,
             @Parameter(description = "Date exacte (yyyy-MM-dd)")
@@ -235,7 +235,7 @@ public class SeanceController {
             @ApiResponse(responseCode = "404", description = "Aucune séance ne correspond à cet ID")
     })
     @IsAdherent
-    public ResponseEntity<SeanceCatalogueDTO> getCatalogueSeance(
+    public ResponseEntity<SeanceCatalogueDto> getCatalogueSeance(
             @Parameter(description = "Identifiant unique de la séance", required = true, example = "1")
             @PathVariable Integer id
     ) {

@@ -37,11 +37,8 @@ public class InscriptionService {
      * @Transactional : opération multi-étapes (lectures + écriture) → atomicité.
      */
     @Transactional
-    public Inscription insert(Inscription inscription) {
-        Integer chienId = inscription.getChien().getId();
-        Integer seanceId = inscription.getSeance().getId();
-
-        // On recharge les entités complètes depuis la BDD (le client n'envoie que les id)
+    public Inscription inscrire(Integer chienId, Integer seanceId) {
+        // On charge les entités complètes depuis la BDD (le client n'envoie que les id)
         Chien chien = chienDao.findById(chienId)
                 .orElseThrow(() -> new ChienNotFoundException(chienId));
         Seance seance = seanceDao.findById(seanceId)
@@ -96,7 +93,10 @@ public class InscriptionService {
         }
 
         // 6. Tout est OK → on crée l'inscription
+        Inscription inscription = new Inscription();
         inscription.setId(key);
+        inscription.setChien(chien);
+        inscription.setSeance(seance);
         inscription.setStatutPresence(StatutPresence.INSCRIT); // valeur initiale (corrige le NOT NULL)
         return inscriptionDao.save(inscription);
     }

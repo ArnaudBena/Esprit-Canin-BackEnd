@@ -12,7 +12,7 @@ import java.time.LocalTime;
  * DTO volontairement restreint : on n'expose JAMAIS la liste des inscrits
  * (chiens / propriétaires des autres adhérents), uniquement un compteur de places.
  */
-public record SeanceCatalogueDTO(
+public record SeanceCatalogueDto(
         Integer id,
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         @JsonFormat(pattern = "HH:mm:ss") LocalTime heureDebut,

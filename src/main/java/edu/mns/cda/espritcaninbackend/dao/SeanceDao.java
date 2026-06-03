@@ -1,6 +1,6 @@
 package edu.mns.cda.espritcaninbackend.dao;
 
-import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDTO;
+import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
 import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.model.StatutPresence;
 import edu.mns.cda.espritcaninbackend.model.StatutSeance;
@@ -74,7 +74,7 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
      * Les places sont calculées via une sous-requête COUNT des inscriptions non annulées.
      */
     @Query("""
-            SELECT new edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDTO(
+            SELECT new edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto(
                 s.id, s.date, s.heureDebut, s.dureeMinutes, s.statut,
                 s.typeSeance.id, s.typeSeance.libelle, s.typeSeance.description,
                 s.typeSeance.ageMinimumMois, s.typeSeance.ageMaximumMois,
@@ -92,7 +92,7 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
                    OR (:disponible = FALSE AND (SELECT COUNT(i) FROM Inscription i WHERE i.seance = s AND i.statutPresence <> :annulee) >= s.typeSeance.participantsMaximum))
             ORDER BY s.date ASC, s.heureDebut ASC
             """)
-    List<SeanceCatalogueDTO> catalogue(@Param("today") LocalDate today,
+    List<SeanceCatalogueDto> catalogue(@Param("today") LocalDate today,
                                        @Param("active") StatutSeance active,
                                        @Param("annulee") StatutPresence annulee,
                                        @Param("typeSeanceId") Integer typeSeanceId,
@@ -104,7 +104,7 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
      * Détail catalogue d'une séance, même projection DTO restreinte.
      */
     @Query("""
-            SELECT new edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDTO(
+            SELECT new edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto(
                 s.id, s.date, s.heureDebut, s.dureeMinutes, s.statut,
                 s.typeSeance.id, s.typeSeance.libelle, s.typeSeance.description,
                 s.typeSeance.ageMinimumMois, s.typeSeance.ageMaximumMois,
@@ -115,6 +115,6 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
             FROM Seance s
             WHERE s.id = :id
             """)
-    Optional<SeanceCatalogueDTO> catalogueById(@Param("id") Integer id,
+    Optional<SeanceCatalogueDto> catalogueById(@Param("id") Integer id,
                                                @Param("annulee") StatutPresence annulee);
 }
