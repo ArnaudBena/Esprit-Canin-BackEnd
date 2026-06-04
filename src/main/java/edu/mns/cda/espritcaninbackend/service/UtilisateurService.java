@@ -64,6 +64,24 @@ public class UtilisateurService {
     }
 
     /**
+     * Mise à jour du profil par l'adhérent lui-même.
+     * On set UNIQUEMENT nom/prénom/email/téléphone : le rôle, le password et la
+     * dateInscription sont volontairement préservés depuis l'existant.
+     * Sécurité : empêche un adhérent de changer son propre rôle (escalade de privilège).
+     */
+    public void updateProfil(int id, Utilisateur profil) {
+        Utilisateur existant = utilisateurDao.findById(id)
+                .orElseThrow(() -> new UtilisateurNotFoundException(id));
+
+        existant.setNom(profil.getNom());
+        existant.setPrenom(profil.getPrenom());
+        existant.setEmail(profil.getEmail());
+        existant.setTelephone(profil.getTelephone());
+
+        utilisateurDao.save(existant);
+    }
+
+    /**
      * Met à jour uniquement le mot de passe. Validation longueur (≥ 8)
      */
     public void updatePassword(int id, String nouveauPassword) {

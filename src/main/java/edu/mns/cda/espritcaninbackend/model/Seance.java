@@ -3,6 +3,7 @@ package edu.mns.cda.espritcaninbackend.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.utile.ValidationGroupe;
+import edu.mns.cda.espritcaninbackend.view.ChienView;
 import edu.mns.cda.espritcaninbackend.view.InscriptionView;
 import edu.mns.cda.espritcaninbackend.view.SeanceView;
 import jakarta.persistence.*;
@@ -24,20 +25,20 @@ import java.util.List;
 public class Seance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView({SeanceView.class, InscriptionView.class})
+    @JsonView({SeanceView.class, InscriptionView.class, ChienView.class})
     protected Integer id;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @FutureOrPresent(groups = ValidationGroupe.OnCreate.class)
     @Column(nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @JsonView({SeanceView.class,InscriptionView.class})
+    @JsonView({SeanceView.class,InscriptionView.class, ChienView.class})
     protected LocalDate date;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
     @JsonFormat(pattern = "HH:mm:ss")
-    @JsonView({SeanceView.class,InscriptionView.class})
+    @JsonView({SeanceView.class,InscriptionView.class, ChienView.class})
     protected LocalTime heureDebut;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
@@ -49,13 +50,13 @@ public class Seance {
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @JsonView(SeanceView.class)
+    @JsonView({SeanceView.class, ChienView.class})
     protected StatutSeance statut;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @JoinColumn(name = "id_type_seance", nullable = false)
-    @JsonView(SeanceView.class)
+    @JsonView({SeanceView.class, ChienView.class, InscriptionView.class})
     protected TypeSeance typeSeance;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
@@ -76,7 +77,7 @@ public class Seance {
         return inscriptions.size() >= typeSeance.getParticipantsMaximum();
     }
 
-    @JsonView({SeanceView.class, InscriptionView.class})
+    @JsonView({SeanceView.class, InscriptionView.class, ChienView.class})
     public Boolean getTerminee() {
         if (date == null) return false;
         return date.isBefore(LocalDate.now());
