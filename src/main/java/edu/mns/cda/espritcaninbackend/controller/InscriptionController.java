@@ -2,10 +2,13 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.dto.InscriptionRequestDto;
+import edu.mns.cda.espritcaninbackend.dto.PresenceRequestDto;
 import edu.mns.cda.espritcaninbackend.model.Chien;
 import edu.mns.cda.espritcaninbackend.model.Inscription;
+import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.security.IsAdherent;
 import edu.mns.cda.espritcaninbackend.security.IsAdmin;
+import edu.mns.cda.espritcaninbackend.security.IsCoachOuAdmin;
 import edu.mns.cda.espritcaninbackend.security.UtilisateurDetails;
 import edu.mns.cda.espritcaninbackend.service.ChienService;
 import edu.mns.cda.espritcaninbackend.service.InscriptionService;
@@ -253,5 +256,69 @@ public class InscriptionController {
 
         inscriptionService.annuler(key);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // Espace coach : appel + validation
+
+    @PatchMapping("/{idChien}/{idSeance}/presence")
+    @Operation(summary = "Faire l'appel : marquer un chien PRESENT/ABSENT (coach de la séance ou admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Présence enregistrée"),
+            @ApiResponse(responseCode = "400", description = "Statut invalide (autre que PRESENT/ABSENT)"),
+            @ApiResponse(responseCode = "403", description = "Pas le coach de cette séance"),
+            @ApiResponse(responseCode = "404", description = "Inscription introuvable"),
+            @ApiResponse(responseCode = "409", description = "Inscription annulée ou séance non terminée")
+    })
+    @IsCoachOuAdmin
+    public ResponseEntity<Void> faireAppel(
+            @AuthenticationPrincipal UtilisateurDetails userDetails,
+            @PathVariable Integer idChien,
+            @PathVariable Integer idSeance,
+            @RequestBody @Valid PresenceRequestDto request
+    ) {
+        Inscription.Key key = new Inscription.Key(idChien, idSeance);
+        Optional<Inscription> optionalInscription = inscriptionService.findById(key);
+        if (optionalInscription.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (!estAdminOuCoachDeLaSeance(optionalInscription.get().getSeance(), userDetails)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        inscriptionService.faireAppel(key, request.statutPresence());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping("/{idChien}/{idSeance}/acquisition")
+    @Operation(summary = "Valider l'acquisition des compétences conférées (coach de la séance ou admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Acquisition validée, progression appliquée"),
+            @ApiResponse(responseCode = "403", description = "Pas le coach de cette séance"),
+            @ApiResponse(responseCode = "404", description = "Inscription introuvable"),
+            @ApiResponse(responseCode = "409", description = "Séance non terminée ou chien pas présent")
+    })
+    @IsCoachOuAdmin
+    public ResponseEntity<Void> validerAcquisition(
+            @AuthenticationPrincipal UtilisateurDetails userDetails,
+            @PathVariable Integer idChien,
+            @PathVariable Integer idSeance
+    ) {
+        Inscription.Key key = new Inscription.Key(idChien, idSeance);
+        Optional<Inscription> optionalInscription = inscriptionService.findById(key);
+        if (optionalInscription.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (!estAdminOuCoachDeLaSeance(optionalInscription.get().getSeance(), userDetails)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        inscriptionService.validerAcquisition(key);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /** autorisé si admin, ou si c'est le coach assigné à la séance. */
+    private boolean estAdminOuCoachDeLaSeance(Seance seance, UtilisateurDetails userDetails) {
+        boolean estAdmin = "Admin".equalsIgnoreCase(userDetails.getUtilisateur().getRole().getNom());
+        boolean estLeCoach = seance.getCoach() != null
+                && seance.getCoach().getId().equals(userDetails.getUtilisateur().getId());
+        return estAdmin || estLeCoach;
     }
 }

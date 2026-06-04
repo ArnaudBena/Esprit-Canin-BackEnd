@@ -191,4 +191,22 @@ public class SeanceService {
             }
         }
     }
+
+    /**
+     * Espace coach : toutes mes séances.
+     */
+    public List<Seance> mesSeances(int coachId) {
+        return seanceDao.findByCoach(coachId);
+    }
+
+    /**
+     * Espace coach : mes séances à traiter (passées + appel non fait).
+     * Filtre final "terminée" en datetime précis (exclut une séance du jour pas encore finie).
+     */
+    public List<Seance> mesSeancesATraiter(int coachId) {
+        return seanceDao.findATraiterParCoach(coachId, StatutSeance.ACTIVE, StatutPresence.INSCRIT, LocalDate.now())
+                .stream()
+                .filter(s -> s.getTerminee())
+                .toList();
+    }
 }
