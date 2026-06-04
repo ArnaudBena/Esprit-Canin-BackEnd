@@ -1,5 +1,6 @@
 package edu.mns.cda.espritcaninbackend.service;
 
+import edu.mns.cda.espritcaninbackend.dao.ChienCompetenceDao;
 import edu.mns.cda.espritcaninbackend.dao.ChienDao;
 import edu.mns.cda.espritcaninbackend.dao.InscriptionDao;
 import edu.mns.cda.espritcaninbackend.dao.SeanceDao;
@@ -23,6 +24,7 @@ public class InscriptionService {
     protected final InscriptionDao inscriptionDao;
     protected final ChienDao chienDao;
     protected final SeanceDao seanceDao;
+    protected final ChienCompetenceDao chienCompetenceDao;
 
     public List<Inscription> findAll() {
         return inscriptionDao.findAll();
@@ -155,5 +157,96 @@ public class InscriptionService {
 
         inscription.setStatutPresence(StatutPresence.ANNULEE);
         inscriptionDao.save(inscription);
+    }
+
+    /**
+     * Appel du coach (après la séance) : marque un chien PRESENT ou ABSENT.
+     * Refusé si l'inscription est ANNULEE ou si la séance n'est pas terminée.
+     */
+    @Transactional
+    public void faireAppel(Inscription.Key key, StatutPresence statutPresence) {
+        // L'appel n'accepte QUE PRESENT ou ABSENT (pas INSCRIT/ANNULEE)
+        if (statutPresence != StatutPresence.PRESENT && statutPresence != StatutPresence.ABSENT) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "L'appel n'accepte que PRESENT ou ABSENT.");
+        }
+
+        Inscription inscription = inscriptionDao.findById(key)
+                .orElseThrow(() -> new InscriptionNotFoundException(key.getChienId(), key.getSeanceId()));
+
+        // Garde-fou : pas d'appel sur une inscription annulée par l'adhérent
+        if (inscription.getStatutPresence() == StatutPresence.ANNULEE) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Inscription annulée : appel impossible.");
+        }
+        // La séance doit être terminée
+        if (!inscription.getSeance().getTerminee()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La séance n'est pas encore terminée.");
+        }
+
+        inscription.setStatutPresence(statutPresence);
+        inscriptionDao.save(inscription);
+    }
+
+    /**
+     * Validation pédagogique par le coach. En bloc : valide toutes les
+     * compétences que le TYPE de la séance confère. Préconditions : séance
+     * terminée + chien PRESENT. Progression sans rétrogradation.
+     */
+    @Transactional
+    public void validerAcquisition(Inscription.Key key) {
+        Inscription inscription = inscriptionDao.findById(key)
+                .orElseThrow(() -> new InscriptionNotFoundException(key.getChienId(), key.getSeanceId()));
+
+        Seance seance = inscription.getSeance();
+        Chien chien = inscription.getChien();
+
+        // Précondition 1 : séance terminée
+        if (!seance.getTerminee()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La séance n'est pas encore terminée.");
+        }
+        // Précondition 2 : on ne valide que pour un chien présent (l'appel d'abord)
+        if (inscription.getStatutPresence() != StatutPresence.PRESENT) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Le chien doit d'abord être marqué présent (faites l'appel).");
+        }
+
+        // Pour chaque compétence CONFEREE par le type, on fait progresser le chien
+        TypeSeance type = seance.getTypeSeance();
+        if (type.getTypeSeancesCompetencesConferees() != null) {
+            for (TypeSeanceCompetenceConferee conferee : type.getTypeSeancesCompetencesConferees()) {
+                appliquerProgression(chien, conferee.getCompetence(), conferee.getNiveauConfere(), seance.getDate());
+            }
+        }
+
+        // On trace la validation sur l'inscription
+        inscription.setAcquisitionValidee(true);
+        inscriptionDao.save(inscription);
+    }
+
+    /**
+     * Monte le niveau d'un chien sur une compétence, sans jamais rétrograder.
+     * Absence de ligne = DEBUTANT. date_acquisition = date de la séance.
+     */
+    private void appliquerProgression(Chien chien, Competence competence,
+                                      NiveauCompetence niveauConfere, LocalDate dateSeance) {
+        ChienCompetence.Key key = new ChienCompetence.Key(chien.getId(), competence.getId());
+        Optional<ChienCompetence> existante = chienCompetenceDao.findById(key);
+
+        NiveauCompetence niveauActuel = existante
+                .map(ChienCompetence::getNiveauActuel)
+                .orElse(NiveauCompetence.DEBUTANT);   // RG01
+
+        // on n'agit QUE si le niveau conféré est strictement supérieur
+        if (niveauConfere.ordinal() <= niveauActuel.ordinal()) {
+            return;
+        }
+
+        ChienCompetence cc = existante.orElseGet(ChienCompetence::new);
+        cc.setId(key);
+        cc.setChien(chien);
+        cc.setCompetence(competence);
+        cc.setNiveauActuel(niveauConfere);
+        cc.setDateAcquisition(dateSeance);
+        chienCompetenceDao.save(cc);
     }
 }

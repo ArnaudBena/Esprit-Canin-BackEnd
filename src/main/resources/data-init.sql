@@ -91,3 +91,16 @@ INSERT INTO inscription (id_chien, id_seance, date_inscription, commentaire_coac
     (1, 1, '2026-04-20', NULL, 'INSCRIT', false),
     (2, 1, '2026-04-21', NULL, 'INSCRIT', false),
     (3, 2, '2026-04-22', 'Bella progresse bien sur le slalom', 'INSCRIT', false);
+
+-- Compétences NÉCESSAIRES (prérequis d'entrée) par type de séance — table "necessite"
+-- Ex : pour entrer en "Agilité intermédiaire", il faut déjà Agilité niveau Débutant.
+INSERT INTO type_seance_competence (id_type_seance, id_competence, niveau_minimum_requis) VALUES
+    (2, 2, 'DEBUTANT');
+
+-- Compétences CONFÉRÉES par type de séance — table "conferer"
+-- Ce que le chien gagne en validant la séance.
+INSERT INTO type_seance_competence_conferee (id_type_seance, id_competence, niveau_confere) VALUES
+    (1, 1, 'DEBUTANT'),        -- Obéissance débutant      -> Obéissance, niveau Débutant
+    (2, 2, 'INTERMEDIAIRE'),   -- Agilité intermédiaire     -> Agilité, niveau Intermédiaire
+    (3, 3, 'DEBUTANT'),        -- Pistage débutant          -> Pistage, niveau Débutant
+    (4, 4, 'DEBUTANT');        -- Sociabilisation chiots    -> Sociabilisation, niveau Débutant

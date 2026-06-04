@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -79,7 +80,8 @@ public class Seance {
 
     @JsonView({SeanceView.class, InscriptionView.class, ChienView.class})
     public Boolean getTerminee() {
-        if (date == null) return false;
-        return date.isBefore(LocalDate.now());
+        if (date == null || heureDebut == null || dureeMinutes == null) return false;
+        // terminée = on a dépassé la fin réelle (date + heure de début + durée)
+        return LocalDateTime.now().isAfter(date.atTime(heureDebut).plusMinutes(dureeMinutes));
     }
 }

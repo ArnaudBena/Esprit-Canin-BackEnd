@@ -2,11 +2,12 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
-import edu.mns.cda.espritcaninbackend.security.IsAdherent;
-import edu.mns.cda.espritcaninbackend.security.IsAdmin;
+import edu.mns.cda.espritcaninbackend.model.Inscription;
+import edu.mns.cda.espritcaninbackend.security.*;
 import edu.mns.cda.espritcaninbackend.service.SeanceService;
 import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.utile.ValidationGroupe;
+import edu.mns.cda.espritcaninbackend.view.InscriptionView;
 import edu.mns.cda.espritcaninbackend.view.SeanceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -242,5 +244,51 @@ public class SeanceController {
         return seanceService.catalogueDetail(id)
                 .map(dto -> new ResponseEntity<>(dto, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    // Espace coach
+
+    @GetMapping("/mes-seances")
+    @Operation(summary = "Mes séances (coach connecté)")
+    @IsCoach
+    @JsonView(SeanceView.class)
+    public List<Seance> getMesSeances(@AuthenticationPrincipal UtilisateurDetails userDetails) {
+        return seanceService.mesSeances(userDetails.getUtilisateur().getId());
+    }
+
+    @GetMapping("/mes-seances-a-traiter")
+    @Operation(summary = "Mes séances passées dont l'appel reste à faire (coach connecté)")
+    @IsCoach
+    @JsonView(SeanceView.class)
+    public List<Seance> getMesSeancesATraiter(@AuthenticationPrincipal UtilisateurDetails userDetails) {
+        return seanceService.mesSeancesATraiter(userDetails.getUtilisateur().getId());
+    }
+
+    @GetMapping("/{id}/participants")
+    @Operation(summary = "Participants (inscriptions) d'une de mes séances (coach) ou de n'importe quelle séance (admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste des participants"),
+            @ApiResponse(responseCode = "403", description = "Pas le coach de cette séance"),
+            @ApiResponse(responseCode = "404", description = "Séance introuvable")
+    })
+    @IsCoachOuAdmin
+    @JsonView(InscriptionView.class)
+    public ResponseEntity<List<Inscription>> getParticipants(
+            @AuthenticationPrincipal UtilisateurDetails userDetails,
+            @PathVariable Integer id
+    ) {
+        Optional<Seance> optionalSeance = seanceService.findById(id);
+        if (optionalSeance.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Seance seance = optionalSeance.get();
+        // le coach de la séance, OU un admin
+        boolean estAdmin = "Admin".equalsIgnoreCase(userDetails.getUtilisateur().getRole().getNom());
+        boolean estLeCoach = seance.getCoach() != null
+                && seance.getCoach().getId().equals(userDetails.getUtilisateur().getId());
+        if (!estAdmin && !estLeCoach) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(seance.getInscriptions(), HttpStatus.OK);
     }
 }

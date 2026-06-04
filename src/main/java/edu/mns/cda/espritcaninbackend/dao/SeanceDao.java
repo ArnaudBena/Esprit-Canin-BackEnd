@@ -117,4 +117,23 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
             """)
     Optional<SeanceCatalogueDto> catalogueById(@Param("id") Integer id,
                                                @Param("annulee") StatutPresence annulee);
+
+    /**
+     * Toutes les séances d'un coach (les plus récentes d'abord).
+     */
+    @Query("SELECT s FROM Seance s WHERE s.coach.id = :coachId ORDER BY s.date DESC, s.heureDebut DESC")
+    List<Seance> findByCoach(@Param("coachId") Integer coachId);
+
+    /**
+     * Séances "à traiter" d'un coach : ACTIVE, dont au moins une inscription est encore INSCRIT
+     * (l'appel n'a pas été fait), et déjà passées (date <= today, affinage précis ensuite côté service).
+     */
+    @Query("SELECT DISTINCT s FROM Seance s JOIN s.inscriptions i " +
+            "WHERE s.coach.id = :coachId AND s.statut = :active " +
+            "AND i.statutPresence = :inscrit AND s.date <= :today " +
+            "ORDER BY s.date ASC, s.heureDebut ASC")
+    List<Seance> findATraiterParCoach(@Param("coachId") Integer coachId,
+                                      @Param("active") StatutSeance active,
+                                      @Param("inscrit") StatutPresence inscrit,
+                                      @Param("today") LocalDate today);
 }
