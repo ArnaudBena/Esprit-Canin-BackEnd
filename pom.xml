@@ -86,6 +86,12 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Base jetable en mémoire pour les tests d'intégration (lancés en IDE) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -124,9 +130,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.5.3</version>
                 <configuration>
-                    <!-- Inclure les tests unitaires -->
+                    <!-- Inclure les tests unitaires (récursif : unit/model, unit/service, ...) -->
                     <includes>
-                        <include>**/unit/*Test.java</include>
+                        <include>**/unit/**/*Test.java</include>
                     </includes>
                     <!-- Exclure les tests d'intégration -->
                     <excludes>
