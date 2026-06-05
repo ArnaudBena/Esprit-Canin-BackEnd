@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *    notre UserDetailsService — obligatoire quand l'endpoint lit
  *    {@code @AuthenticationPrincipal} (mes-seances, participants, mes-inscriptions).
  *
- * ⚠️ Lancé en IDE uniquement (package `integration` exclu du `mvn test`).
+ * Lancé en IDE uniquement (package `integration` exclu du `mvn test`).
  *
  * Jeu de données (data-init.sql) :
  *  - jean.dupont@mail.fr  : Adhérent (possède Rex, Luna, inscrits séance 1)
