@@ -1,16 +1,21 @@
 package edu.mns.cda.espritcaninbackend.service;
 
+import edu.mns.cda.espritcaninbackend.dao.ChienDao;
+import edu.mns.cda.espritcaninbackend.dao.InscriptionDao;
 import edu.mns.cda.espritcaninbackend.dao.RoleDao;
 import edu.mns.cda.espritcaninbackend.dao.UtilisateurDao;
 import edu.mns.cda.espritcaninbackend.exception.UtilisateurNotFoundException;
 import edu.mns.cda.espritcaninbackend.model.Role;
+import edu.mns.cda.espritcaninbackend.model.StatutPresence;
 import edu.mns.cda.espritcaninbackend.model.Utilisateur;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +26,8 @@ public class UtilisateurService {
     protected final UtilisateurDao utilisateurDao;
     protected final PasswordEncoder passwordEncoder;
     protected final RoleDao roleDao;
+    protected final ChienDao chienDao;
+    protected final InscriptionDao inscriptionDao;
 
     public List<Utilisateur> findAll() {
         return utilisateurDao.findAllOrderByNomPrenom();
@@ -39,6 +46,10 @@ public class UtilisateurService {
     }
 
     public void insert(Utilisateur utilisateur) {
+        if (roleEstAdmin(utilisateur.getRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Le rôle Admin n'est pas attribuable.");
+        }
         utilisateur.setId(null);
         utilisateur.setPassword(passwordEncoder.encode(utilisateur.getPassword()));
         utilisateurDao.save(utilisateur);
@@ -53,6 +64,15 @@ public class UtilisateurService {
     public void update(int id, Utilisateur utilisateurToUpdate) {
         Utilisateur existant = utilisateurDao.findById(id)
                 .orElseThrow(() -> new UtilisateurNotFoundException(id));
+
+        if (estAdmin(existant)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Un compte Admin n'est pas modifiable.");
+        }
+        if (roleEstAdmin(utilisateurToUpdate.getRole())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Le rôle Admin n'est pas attribuable.");
+        }
 
         existant.setNom(utilisateurToUpdate.getNom());
         existant.setPrenom(utilisateurToUpdate.getPrenom());
@@ -99,30 +119,56 @@ public class UtilisateurService {
     }
 
     /**
-     * Règle métier MVP : on refuse la suppression d'un utilisateur qui
-     * a encore des chiens enregistrés OU qui est coach d'au moins une
-     * séance (passée ou future).
-     * TODO Évolution possible : orphelinage (chien.utilisateur = null + anonymisation)
+     * Suppression d'un compte par un admin.
+     * - Un compte Admin n'est pas supprimable (403).
+     * - Un coach assigné à des séances est protégé (409).
+     * - Un adhérent encore inscrit à des séances futures est protégé (409).
+     * - Sinon : cascade (chiens + inscriptions passées) puis suppression.
+     * TODO Évolution : Soft delete + anonymisation des données.
      */
+    @Transactional
     public void delete(int id) {
         Utilisateur utilisateur = utilisateurDao.findById(id)
                 .orElseThrow(() -> new UtilisateurNotFoundException(id));
 
-        if (utilisateur.getChiens() != null && !utilisateur.getChiens().isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Cet utilisateur a encore " + utilisateur.getChiens().size() + " chien(s) enregistré(s). Supprimez-les avant."
-            );
+        if (estAdmin(utilisateur)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Un compte Admin n'est pas supprimable.");
         }
-
         if (utilisateur.getSeancesCoachees() != null && !utilisateur.getSeancesCoachees().isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Cet utilisateur est coach sur " + utilisateur.getSeancesCoachees().size() + " séance(s). Réaffectez avant."
-            );
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cet utilisateur est coach sur " + utilisateur.getSeancesCoachees().size() + " séance(s). Réaffectez avant.");
+        }
+        long futures = inscriptionDao.countInscriptionsFuturesActives(id, LocalDate.now(), StatutPresence.ANNULEE);
+        if (futures > 0) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cet utilisateur a " + futures + " inscription(s) à des séances futures. Annulez-les avant.");
         }
 
-        utilisateurDao.deleteById(id);
+        supprimerUtilisateurEtChiens(utilisateur);
+    }
+
+    /**
+     * Suppression de SON propre compte (droit à l'effacement RGPD).
+     * - Un Admin ne peut pas se supprimer (403).
+     * - Un coach avec séances est protégé (409).
+     * - Sinon : cascade TOTALE (chiens + toutes inscriptions, même futures).
+     */
+    @Transactional
+    public void supprimerMonCompte(int id) {
+        Utilisateur utilisateur = utilisateurDao.findById(id)
+                .orElseThrow(() -> new UtilisateurNotFoundException(id));
+
+        if (estAdmin(utilisateur)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Un compte Admin ne peut pas être supprimé.");
+        }
+        if (utilisateur.getSeancesCoachees() != null && !utilisateur.getSeancesCoachees().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Vous êtes coach sur des séances. Contactez un administrateur.");
+        }
+
+        supprimerUtilisateurEtChiens(utilisateur);
     }
 
     /**
@@ -138,5 +184,27 @@ public class UtilisateurService {
                 ));
         utilisateur.setRole(adherent);
         insert(utilisateur); // setId(null) + hash password + save
+    }
+
+    /** Vrai si l'utilisateur a le rôle Admin. */
+    private boolean estAdmin(Utilisateur utilisateur) {
+        return utilisateur.getRole() != null
+                && "Admin".equalsIgnoreCase(utilisateur.getRole().getNom());
+    }
+
+    /** Vrai si la référence de rôle (résolue en base) correspond au rôle Admin. */
+    private boolean roleEstAdmin(Role role) {
+        if (role == null || role.getId() == null) return false;
+        return roleDao.findById(role.getId())
+                .map(r -> "Admin".equalsIgnoreCase(r.getNom()))
+                .orElse(false);
+    }
+
+    /** Suppression en cascade : les chiens d'abord (cascade inscriptions + compétences), puis l'utilisateur. */
+    private void supprimerUtilisateurEtChiens(Utilisateur utilisateur) {
+        if (utilisateur.getChiens() != null && !utilisateur.getChiens().isEmpty()) {
+            chienDao.deleteAll(utilisateur.getChiens());
+        }
+        utilisateurDao.deleteById(utilisateur.getId());
     }
 }

@@ -349,4 +349,19 @@ public class UtilisateurController {
     }
 
     public record PasswordUpdateRequest(String password) {}
+
+    @DeleteMapping("/profil")
+    @IsConnecte
+    @Operation(summary = "Supprimer mon compte (droit à l'effacement RGPD)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Compte supprimé"),
+            @ApiResponse(responseCode = "403", description = "Compte Admin non supprimable."),
+            @ApiResponse(responseCode = "409", description = "Coach encore assigné à des séances")
+    })
+    public ResponseEntity<Void> supprimerMonCompte(
+            @AuthenticationPrincipal UtilisateurDetails utilisateurDetails
+    ) {
+        utilisateurService.supprimerMonCompte(utilisateurDetails.getUtilisateur().getId());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
