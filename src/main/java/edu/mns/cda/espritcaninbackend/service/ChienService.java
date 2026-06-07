@@ -27,6 +27,13 @@ public class ChienService {
     }
 
     /**
+     * Liste les chiens d'un propriétaire (espace adhérent : "mes chiens").
+     */
+    public List<Chien> findByProprietaire(int utilisateurId) {
+        return chienDao.findByProprietaire(utilisateurId);
+    }
+
+    /**
      * Recherche avec filtre optionnels
      */
     public List<Chien> search(String recherche, Sexe sexe) {

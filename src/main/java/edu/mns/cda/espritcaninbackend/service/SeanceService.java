@@ -3,8 +3,10 @@ package edu.mns.cda.espritcaninbackend.service;
 import edu.mns.cda.espritcaninbackend.dao.SeanceDao;
 import edu.mns.cda.espritcaninbackend.dao.TypeSeanceDao;
 import edu.mns.cda.espritcaninbackend.dao.UtilisateurDao;
+import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
 import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
 import edu.mns.cda.espritcaninbackend.model.Seance;
+import edu.mns.cda.espritcaninbackend.model.StatutPresence;
 import edu.mns.cda.espritcaninbackend.model.StatutSeance;
 import edu.mns.cda.espritcaninbackend.model.TypeSeance;
 import edu.mns.cda.espritcaninbackend.model.Utilisateur;
@@ -43,6 +45,24 @@ public class SeanceService {
         boolean filtrerDate = (date != null);
         LocalDate dateEffective = filtrerDate ? date : LocalDate.now(); // valeur bidon non utilisée si filtrerDate=false
         return seanceDao.search(typeSeanceId, dateEffective, filtrerDate, coachId);
+    }
+
+    /**
+     * Catalogue adhérent (écran 07) : séances à venir + ACTIVE, filtrées côté serveur.
+     * @param disponible NULL = toutes, TRUE = avec places, FALSE = complètes
+     */
+    public List<SeanceCatalogueDto> catalogue(Integer typeSeanceId, LocalDate date, Boolean disponible) {
+        boolean filtrerDate = (date != null);
+        LocalDate dateEffective = filtrerDate ? date : LocalDate.now(); // valeur ignorée si filtrerDate=false
+        return seanceDao.catalogue(LocalDate.now(), StatutSeance.ACTIVE, StatutPresence.ANNULEE,
+                typeSeanceId, dateEffective, filtrerDate, disponible);
+    }
+
+    /**
+     * Détail catalogue d'une séance (écran 08).
+     */
+    public Optional<SeanceCatalogueDto> catalogueDetail(int id) {
+        return seanceDao.catalogueById(id, StatutPresence.ANNULEE);
     }
 
     public void insert(Seance seance) {
@@ -170,5 +190,23 @@ public class SeanceService {
                 );
             }
         }
+    }
+
+    /**
+     * Espace coach : toutes mes séances.
+     */
+    public List<Seance> mesSeances(int coachId) {
+        return seanceDao.findByCoach(coachId);
+    }
+
+    /**
+     * Espace coach : mes séances à traiter (passées + appel non fait).
+     * Filtre final "terminée" en datetime précis (exclut une séance du jour pas encore finie).
+     */
+    public List<Seance> mesSeancesATraiter(int coachId) {
+        return seanceDao.findATraiterParCoach(coachId, StatutSeance.ACTIVE, StatutPresence.INSCRIT, LocalDate.now())
+                .stream()
+                .filter(s -> s.getTerminee())
+                .toList();
     }
 }

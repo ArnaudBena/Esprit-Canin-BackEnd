@@ -56,7 +56,6 @@ public class Inscription {
     @JsonView({ChienView.class,InscriptionView.class})
     protected Seance seance;
 
-    @NotNull
     @CreatedDate
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(nullable = false, updatable = false)
@@ -68,7 +67,6 @@ public class Inscription {
     @JsonView({SeanceView.class,InscriptionView.class})
     protected String commentaireCoach;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @JsonView({ChienView.class, SeanceView.class,InscriptionView.class})

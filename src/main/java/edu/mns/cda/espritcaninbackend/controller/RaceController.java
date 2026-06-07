@@ -3,6 +3,8 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.model.Race;
+import edu.mns.cda.espritcaninbackend.security.IsAdmin;
+import edu.mns.cda.espritcaninbackend.security.IsConnecte;
 import edu.mns.cda.espritcaninbackend.service.RaceService;
 import edu.mns.cda.espritcaninbackend.view.RaceView;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,6 +49,7 @@ public class RaceController {
                     description = "Liste retournée avec succès"
             )
     })
+    @IsConnecte
     @JsonView(RaceView.class)
     public List<Race> getAllRaces() {
         return raceService.findAll();
@@ -70,6 +73,7 @@ public class RaceController {
                     description = "Aucune race ne correspond à cet ID"
             )
     })
+    @IsAdmin
     @JsonView(RaceView.class)
     public ResponseEntity<Race> get(
             @Parameter(description = "Identifiant unique de la race", required = true, example = "1")
@@ -104,6 +108,7 @@ public class RaceController {
                     description = "Corps de la requête invalide ou champs manquants"
             )
     })
+    @IsAdmin
     @JsonView(RaceView.class)
     public ResponseEntity<Race> createRace(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -140,6 +145,7 @@ public class RaceController {
                     description = "Race utilisée par un ou plusieurs chiens"
             )
     })
+    @IsAdmin
     public ResponseEntity<Void> deleteRace(
             @Parameter(description = "Identifiant unique de la race à supprimer", required = true, example = "1")
             @PathVariable Integer id
@@ -173,6 +179,7 @@ public class RaceController {
                     description = "Corps de la requête invalide ou champs manquants"
             )
     })
+    @IsAdmin
     public ResponseEntity<Void> updateRace(
             @Parameter(description = "Identifiant unique de la race à mettre à jour", required = true, example = "1")
             @PathVariable Integer id,

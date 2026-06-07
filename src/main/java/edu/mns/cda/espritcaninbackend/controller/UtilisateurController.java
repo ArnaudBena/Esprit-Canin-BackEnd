@@ -2,6 +2,9 @@ package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.model.Utilisateur;
+import edu.mns.cda.espritcaninbackend.security.IsAdmin;
+import edu.mns.cda.espritcaninbackend.security.IsConnecte;
+import edu.mns.cda.espritcaninbackend.security.UtilisateurDetails;
 import edu.mns.cda.espritcaninbackend.service.UtilisateurService;
 import edu.mns.cda.espritcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.espritcaninbackend.view.UtilisateurView;
@@ -13,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +37,7 @@ public class UtilisateurController {
     protected final UtilisateurService utilisateurService;
 
     @GetMapping("/list")
+    @IsAdmin
     @Operation(
             summary = "Lister tous les utilisateurs",
             description = """
@@ -53,6 +58,7 @@ public class UtilisateurController {
     }
 
     @GetMapping("/search")
+    @IsAdmin
     @Operation(
             summary = "Rechercher des utilisateurs avec filtres",
             description = """
@@ -75,6 +81,7 @@ public class UtilisateurController {
     }
 
     @GetMapping("/{id}")
+    @IsAdmin
     @Operation(
             summary = "Récuperer un utilisateur par son ID",
             description = """
@@ -107,6 +114,7 @@ public class UtilisateurController {
     }
 
     @PostMapping
+    @IsAdmin
     @Operation(
             summary = "Créer un nouvel utilisateur",
             description = """
@@ -143,6 +151,7 @@ public class UtilisateurController {
     }
 
     @DeleteMapping("/{id}")
+    @IsAdmin
     @Operation(
             summary = "Supprimer un utilisateur par son ID",
             description = """
@@ -176,6 +185,7 @@ public class UtilisateurController {
     }
 
     @PutMapping("/{id}")
+    @IsAdmin
     @Operation(
             summary = "Mettre à jour un utilisateur existant",
             description = """
@@ -220,6 +230,7 @@ public class UtilisateurController {
     }
 
     @PatchMapping("/{id}/password")
+    @IsAdmin
     @Operation(
             summary = "Modifier le mot de passe d'un utilisateur",
             description = """
@@ -253,5 +264,104 @@ public class UtilisateurController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    // ----- Espace adhérent  -----
+
+    @GetMapping("/profil")
+    @IsConnecte
+    @Operation(
+            summary = "Récupérer mon profil",
+            description = """
+                    Retourne les informations de l'utilisateur actuellement connecté (déduit du JWT).
+                    Aucun paramètre : l'identité vient du token.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Profil retourné avec succès")
+    })
+    @JsonView(UtilisateurView.class)
+    public ResponseEntity<Utilisateur> getMonProfil(
+            @AuthenticationPrincipal UtilisateurDetails utilisateurDetails
+    ) {
+        // On recharge depuis la BDD (dans la session de la requête) pour éviter une
+        // LazyInitializationException : l'entité du principal vient du JwtFilter (détachée).
+        Optional<Utilisateur> optionalUtilisateur =
+                utilisateurService.findById(utilisateurDetails.getUtilisateur().getId());
+
+        if (optionalUtilisateur.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(optionalUtilisateur.get(), HttpStatus.OK);
+    }
+
+    @PutMapping("/profil")
+    @IsConnecte
+    @Operation(
+            summary = "Mettre à jour mon profil",
+            description = """
+                    Met à jour les informations de l'utilisateur connecté (nom, prénom, email, téléphone).
+                    Le rôle et le mot de passe ne sont PAS modifiables via cet endpoint (sécurité).
+                    Le mot de passe se change via PATCH /utilisateur/profil/password.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Profil mis à jour avec succès, aucun contenu retourné"),
+            @ApiResponse(responseCode = "400", description = "Corps de la requête invalide ou champs manquants"),
+            @ApiResponse(responseCode = "409", description = "Email déjà utilisé")
+    })
+    public ResponseEntity<Void> updateMonProfil(
+            @AuthenticationPrincipal UtilisateurDetails utilisateurDetails,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Nouvelles valeurs du profil : nom, prénom, email, téléphone."
+            )
+            @RequestBody
+            @Validated(ValidationGroupe.OnProfilUpdate.class)
+            Utilisateur profil
+    ) {
+        utilisateurService.updateProfil(utilisateurDetails.getUtilisateur().getId(), profil);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping("/profil/password")
+    @IsConnecte
+    @Operation(
+            summary = "Changer mon mot de passe",
+            description = """
+                    Met à jour le mot de passe de l'utilisateur connecté.
+                    Le nouveau mot de passe doit faire au moins 8 caractères.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Mot de passe mis à jour avec succès"),
+            @ApiResponse(responseCode = "400", description = "Mot de passe trop court (min 8 caractères) ou manquant")
+    })
+    public ResponseEntity<Void> updateMonPassword(
+            @AuthenticationPrincipal UtilisateurDetails utilisateurDetails,
+            @RequestBody PasswordUpdateRequest body
+    ) {
+        utilisateurService.updatePassword(
+                utilisateurDetails.getUtilisateur().getId(),
+                body == null ? null : body.password()
+        );
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     public record PasswordUpdateRequest(String password) {}
+
+    @DeleteMapping("/profil")
+    @IsConnecte
+    @Operation(summary = "Supprimer mon compte (droit à l'effacement RGPD)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Compte supprimé"),
+            @ApiResponse(responseCode = "403", description = "Compte Admin non supprimable."),
+            @ApiResponse(responseCode = "409", description = "Coach encore assigné à des séances")
+    })
+    public ResponseEntity<Void> supprimerMonCompte(
+            @AuthenticationPrincipal UtilisateurDetails utilisateurDetails
+    ) {
+        utilisateurService.supprimerMonCompte(utilisateurDetails.getUtilisateur().getId());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

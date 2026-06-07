@@ -1,9 +1,13 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
+import edu.mns.cda.espritcaninbackend.model.Inscription;
+import edu.mns.cda.espritcaninbackend.security.*;
 import edu.mns.cda.espritcaninbackend.service.SeanceService;
 import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.utile.ValidationGroupe;
+import edu.mns.cda.espritcaninbackend.view.InscriptionView;
 import edu.mns.cda.espritcaninbackend.view.SeanceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +51,7 @@ public class SeanceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Liste retournée avec succès")
     })
+    @IsAdmin
     @JsonView(SeanceView.class)
     public List<Seance> getAllSeances() {
         return seanceService.findAll();
@@ -63,6 +69,7 @@ public class SeanceController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Liste filtrée retournée avec succès")
     })
+    @IsAdmin
     @JsonView(SeanceView.class)
     public List<Seance> searchSeances(
             @Parameter(description = "ID du type de séance")
@@ -87,6 +94,7 @@ public class SeanceController {
             @ApiResponse(responseCode = "200", description = "Séance trouvée et retournée avec succès"),
             @ApiResponse(responseCode = "404", description = "Aucune séance ne correspond à cet ID")
     })
+    @IsAdmin
     @JsonView(SeanceView.class)
     public ResponseEntity<Seance> get(
             @Parameter(description = "Identifiant unique de la séance", required = true, example = "1")
@@ -114,6 +122,7 @@ public class SeanceController {
             @ApiResponse(responseCode = "201", description = "Séance créée avec succès"),
             @ApiResponse(responseCode = "400", description = "Corps de la requête invalide ou champs manquants")
     })
+    @IsAdmin
     @JsonView(SeanceView.class)
     public ResponseEntity<Seance> createSeance(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -141,6 +150,7 @@ public class SeanceController {
             @ApiResponse(responseCode = "204", description = "Séance supprimée avec succès, aucun contenu retourné"),
             @ApiResponse(responseCode = "404", description = "Aucune séance ne correspond à cet ID")
     })
+    @IsAdmin
     public ResponseEntity<Seance> deleteSeance(
             @Parameter(description = "Identifiant unique de la séance à supprimer", required = true, example = "1")
             @PathVariable Integer id
@@ -166,6 +176,7 @@ public class SeanceController {
             @ApiResponse(responseCode = "404", description = "Aucune séance ne correspond à cet ID"),
             @ApiResponse(responseCode = "400", description = "Corps de la requête invalide ou champs manquants")
     })
+    @IsAdmin
     public ResponseEntity<Void> updateSeance(
             @Parameter(description = "Identifiant unique de la séance à mettre à jour", required = true, example = "1")
             @PathVariable Integer id,
@@ -181,5 +192,103 @@ public class SeanceController {
         seanceService.update(id, seanceToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // ===================================================================
+    // Catalogue adhérent : séances à venir + ACTIVE.
+    // Réponse via DTO restreint (aucune fuite des inscrits). Filtrage serveur.
+    // ===================================================================
+
+    @GetMapping("/catalogue")
+    @Operation(
+            summary = "Catalogue des séances à venir (adhérent connecté)",
+            description = """
+                    Retourne les séances à venir et actives, sous forme de DTO restreint
+                    (sans la liste des inscrits). Filtres optionnels côté serveur :
+                    type de séance, date exacte, disponibilité.
+                    Tri imposé serveur : date ASC, heureDebut ASC.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Catalogue retourné avec succès")
+    })
+    @IsAdherent
+    public List<SeanceCatalogueDto> getCatalogue(
+            @Parameter(description = "ID du type de séance")
+            @RequestParam(required = false) Integer typeSeanceId,
+            @Parameter(description = "Date exacte (yyyy-MM-dd)")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @Parameter(description = "Disponibilité : true = places restantes, false = complètes, absent = toutes")
+            @RequestParam(required = false) Boolean disponible
+    ) {
+        return seanceService.catalogue(typeSeanceId, date, disponible);
+    }
+
+    @GetMapping("/catalogue/{id}")
+    @Operation(
+            summary = "Détail catalogue d'une séance (adhérent connecté)",
+            description = """
+                    Retourne le détail d'une séance (DTO restreint, sans la liste des inscrits)
+                    pour la page d'inscription. Retourne 404 si l'ID est introuvable.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Séance trouvée et retournée avec succès"),
+            @ApiResponse(responseCode = "404", description = "Aucune séance ne correspond à cet ID")
+    })
+    @IsAdherent
+    public ResponseEntity<SeanceCatalogueDto> getCatalogueSeance(
+            @Parameter(description = "Identifiant unique de la séance", required = true, example = "1")
+            @PathVariable Integer id
+    ) {
+        return seanceService.catalogueDetail(id)
+                .map(dto -> new ResponseEntity<>(dto, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    // Espace coach
+
+    @GetMapping("/mes-seances")
+    @Operation(summary = "Mes séances (coach connecté)")
+    @IsCoach
+    @JsonView(SeanceView.class)
+    public List<Seance> getMesSeances(@AuthenticationPrincipal UtilisateurDetails userDetails) {
+        return seanceService.mesSeances(userDetails.getUtilisateur().getId());
+    }
+
+    @GetMapping("/mes-seances-a-traiter")
+    @Operation(summary = "Mes séances passées dont l'appel reste à faire (coach connecté)")
+    @IsCoach
+    @JsonView(SeanceView.class)
+    public List<Seance> getMesSeancesATraiter(@AuthenticationPrincipal UtilisateurDetails userDetails) {
+        return seanceService.mesSeancesATraiter(userDetails.getUtilisateur().getId());
+    }
+
+    @GetMapping("/{id}/participants")
+    @Operation(summary = "Participants (inscriptions) d'une de mes séances (coach) ou de n'importe quelle séance (admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste des participants"),
+            @ApiResponse(responseCode = "403", description = "Pas le coach de cette séance"),
+            @ApiResponse(responseCode = "404", description = "Séance introuvable")
+    })
+    @IsCoachOuAdmin
+    @JsonView(InscriptionView.class)
+    public ResponseEntity<List<Inscription>> getParticipants(
+            @AuthenticationPrincipal UtilisateurDetails userDetails,
+            @PathVariable Integer id
+    ) {
+        Optional<Seance> optionalSeance = seanceService.findById(id);
+        if (optionalSeance.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Seance seance = optionalSeance.get();
+        // le coach de la séance, OU un admin
+        boolean estAdmin = "Admin".equalsIgnoreCase(userDetails.getUtilisateur().getRole().getNom());
+        boolean estLeCoach = seance.getCoach() != null
+                && seance.getCoach().getId().equals(userDetails.getUtilisateur().getId());
+        if (!estAdmin && !estLeCoach) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(seance.getInscriptions(), HttpStatus.OK);
     }
 }

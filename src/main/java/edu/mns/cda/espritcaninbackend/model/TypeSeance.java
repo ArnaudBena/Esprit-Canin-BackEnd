@@ -1,6 +1,8 @@
 package edu.mns.cda.espritcaninbackend.model;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.espritcaninbackend.view.ChienView;
+import edu.mns.cda.espritcaninbackend.view.InscriptionView;
 import edu.mns.cda.espritcaninbackend.view.SeanceView;
 import edu.mns.cda.espritcaninbackend.view.TypeSeanceView;
 import jakarta.persistence.*;
@@ -24,12 +26,12 @@ public class TypeSeance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView({TypeSeanceView.class, SeanceView.class})
+    @JsonView({TypeSeanceView.class, SeanceView.class, ChienView.class, InscriptionView.class})
     protected Integer id;
 
     @Column(nullable = false, unique = true) // peut être enlever le unique
     @NotBlank(message = "Le libellé de la séance ne peut pas être vide")
-    @JsonView({TypeSeanceView.class, SeanceView.class})
+    @JsonView({TypeSeanceView.class, SeanceView.class, ChienView.class, InscriptionView.class})
     protected String libelle;
 
     @Column(columnDefinition = "TEXT")

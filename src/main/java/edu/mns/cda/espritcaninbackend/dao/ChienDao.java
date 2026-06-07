@@ -31,6 +31,13 @@ public interface ChienDao extends JpaRepository<Chien, Integer> {
                        @Param("filtrerSexe") boolean filtrerSexe);
 
     /**
+     * Liste les chiens d'un propriétaire donné (espace adhérent : "mes chiens").
+     * Tri imposé serveur : nom du chien ASC.
+     */
+    @Query("SELECT c FROM Chien c WHERE c.utilisateur.id = :utilisateurId ORDER BY c.nom ASC")
+    List<Chien> findByProprietaire(@Param("utilisateurId") Integer utilisateurId);
+
+    /**
      * Compte le nombre de chiens qui utilisent la race donnée.
      * Utilisé par RaceService.delete pour bloquer la suppression d'une race référencée.
      */
