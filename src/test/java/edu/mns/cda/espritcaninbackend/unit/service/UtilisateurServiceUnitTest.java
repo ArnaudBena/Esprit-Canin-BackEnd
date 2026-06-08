@@ -237,4 +237,20 @@ class UtilisateurServiceUnitTest {
         // pas de contrôle des inscriptions futures pour le self-delete (effacement total)
         verify(inscriptionDao, never()).countInscriptionsFuturesActives(anyInt(), any(), any());
     }
+
+    // ===================== Email déjà utilisé =====================
+
+    @Test
+    @DisplayName("insert : email déjà utilisé -> 409")
+    void insert_emailExistant_leve409() {
+        Utilisateur u = utilisateur(0, "Adherent", 1);
+        u.setEmail("existe@mail.fr");
+        when(roleDao.findById(1)).thenReturn(Optional.of(role(1, "Adherent")));
+        when(utilisateurDao.findByEmail("existe@mail.fr")).thenReturn(Optional.of(new Utilisateur()));
+
+        ResponseStatusException ex = Assertions.assertThrows(ResponseStatusException.class,
+                () -> service.insert(u));
+        Assertions.assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
+        verify(utilisateurDao, never()).save(any());
+    }
 }

@@ -50,6 +50,10 @@ public class UtilisateurService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "Le rôle Admin n'est pas attribuable.");
         }
+        if (utilisateurDao.findByEmail(utilisateur.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cet email est déjà utilisé.");
+        }
         utilisateur.setId(null);
         utilisateur.setPassword(passwordEncoder.encode(utilisateur.getPassword()));
         utilisateurDao.save(utilisateur);
