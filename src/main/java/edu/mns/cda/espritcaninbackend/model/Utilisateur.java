@@ -27,26 +27,33 @@ public class Utilisateur {
     @JsonView({UtilisateurView.class, ChienView.class, SeanceView.class})
     protected Integer id;
 
-    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class})
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
+    ValidationGroupe.OnInscription.class})
     @Column(nullable = false, length = 50)
-    @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class})
+    @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
+    ValidationGroupe.OnInscription.class})
     @JsonView({UtilisateurView.class,ChienView.class, SeanceView.class})
     protected String nom;
 
-    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class})
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
+    ValidationGroupe.OnInscription.class})
     @Column(nullable = false, length = 50)
-    @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class})
+    @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
+    ValidationGroupe.OnInscription.class})
     @JsonView({UtilisateurView.class,ChienView.class, SeanceView.class})
     protected String prenom;
 
-    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class})
-    @Email(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class})
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
+    ValidationGroupe.OnInscription.class})
+    @Email(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
+    ValidationGroupe.OnInscription.class})
     @Column(nullable = false, unique = true, length = 100)
-    @Size(max = 100, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class})
+    @Size(max = 100, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
+    ValidationGroupe.OnInscription.class})
     @JsonView({UtilisateurView.class,ChienView.class})
     protected String email;
 
-    @NotBlank(groups = ValidationGroupe.OnCreate.class)
+    @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnInscription.class})
     @Column(nullable = false)
     @Size(min = 8, groups = ValidationGroupe.OnCreate.class, message = "Le mot de passe ne peut pas faire moins de 8 caractères")
     protected String password;
@@ -56,7 +63,8 @@ public class Utilisateur {
     @JsonView(UtilisateurView.class)
     protected LocalDate dateInscription;
 
-    @Size(max = 20, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class}, message = "Le numéro de téléphone est trop long")
+    @Size(max = 20, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
+    ValidationGroupe.OnInscription.class}, message = "Le numéro de téléphone est trop long")
     @JsonView({UtilisateurView.class,ChienView.class})
     protected String telephone;
 
