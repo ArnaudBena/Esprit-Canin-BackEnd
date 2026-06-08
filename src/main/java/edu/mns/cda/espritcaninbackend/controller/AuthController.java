@@ -39,7 +39,7 @@ public class AuthController {
     @Operation(summary = "Inscription publique", description = "Crée un compte adhérent. Le rôle est forcé à 'Adherent' côté serveur.")
     @JsonView(UtilisateurView.class)
     public ResponseEntity<Utilisateur> inscription(
-            @RequestBody @Validated(ValidationGroupe.OnCreate.class) Utilisateur utilisateurAInscrire
+            @RequestBody @Validated(ValidationGroupe.OnInscription.class) Utilisateur utilisateurAInscrire
     ) {
         utilisateurService.inscriptionPublique(utilisateurAInscrire);
         return new ResponseEntity<>(utilisateurAInscrire, HttpStatus.CREATED);

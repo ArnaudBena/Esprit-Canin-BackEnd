@@ -12,7 +12,7 @@ services:
       - postgres_data:/var/lib/postgresql
 
   app:
-    image: arnaudbena/esprit-canin-backend
+    image: arnaudbena/esprit-canin-backend:0.0.2-SNAPSHOT
     ports:
       - "8080:8080"
     depends_on:
