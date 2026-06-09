@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.dao.TypeSeanceDao;
 import edu.mns.cda.espritcaninbackend.model.TypeSeance;
 import edu.mns.cda.espritcaninbackend.security.IsAdmin;
+import edu.mns.cda.espritcaninbackend.security.IsConnecte;
 import edu.mns.cda.espritcaninbackend.view.TypeSeanceView;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -46,6 +47,7 @@ public class TypeSeanceController {
             @ApiResponse(responseCode = "200", description = "Liste retournée avec succès")
     })
     @JsonView(TypeSeanceView.class)
+    @IsConnecte
     public List<TypeSeance> getAllTypesSeance() {
         return typeSeanceDao.findAllOrderByLibelle();
     }
