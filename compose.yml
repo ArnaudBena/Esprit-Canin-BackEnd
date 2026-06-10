@@ -1,3 +1,5 @@
+name: esprit-canin-backend
+
 services:
   postgres:
     image: postgres:18
@@ -12,7 +14,7 @@ services:
       - postgres_data:/var/lib/postgresql
 
   app:
-    image: arnaudbena/esprit-canin-backend:0.0.2-SNAPSHOT
+    image: arnaudbena/esprit-canin-backend:0.9.0
     ports:
       - "8080:8080"
     depends_on:
@@ -20,3 +22,4 @@ services:
 
 volumes:
   postgres_data:
+    name: club-canin-backend_postgres_data

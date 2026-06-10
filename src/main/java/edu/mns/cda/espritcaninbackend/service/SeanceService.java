@@ -3,6 +3,7 @@ package edu.mns.cda.espritcaninbackend.service;
 import edu.mns.cda.espritcaninbackend.dao.SeanceDao;
 import edu.mns.cda.espritcaninbackend.dao.TypeSeanceDao;
 import edu.mns.cda.espritcaninbackend.dao.UtilisateurDao;
+import edu.mns.cda.espritcaninbackend.dto.PrerequisDto;
 import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
 import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
 import edu.mns.cda.espritcaninbackend.model.Seance;
@@ -63,6 +64,10 @@ public class SeanceService {
      */
     public Optional<SeanceCatalogueDto> catalogueDetail(int id) {
         return seanceDao.catalogueById(id, StatutPresence.ANNULEE);
+    }
+
+    public List<PrerequisDto> prerequis(int seanceId) {
+        return seanceDao.findPrerequisBySeanceId(seanceId);
     }
 
     public void insert(Seance seance) {

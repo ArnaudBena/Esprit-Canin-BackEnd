@@ -1,5 +1,6 @@
 package edu.mns.cda.espritcaninbackend.dao;
 
+import edu.mns.cda.espritcaninbackend.dto.PrerequisDto;
 import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
 import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.model.StatutPresence;
@@ -117,6 +118,14 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
             """)
     Optional<SeanceCatalogueDto> catalogueById(@Param("id") Integer id,
                                                @Param("annulee") StatutPresence annulee);
+
+    @Query("""
+        SELECT new edu.mns.cda.espritcaninbackend.dto.PrerequisDto(c.nom, tsc.niveauMinimumRequis)
+        FROM TypeSeanceCompetence tsc
+        JOIN tsc.competence c
+        WHERE tsc.typeSeance.id = (SELECT s.typeSeance.id FROM Seance s WHERE s.id = :seanceId)
+        """)
+    List<PrerequisDto> findPrerequisBySeanceId(@Param("seanceId") int seanceId);
 
     /**
      * Toutes les séances d'un coach (les plus récentes d'abord).

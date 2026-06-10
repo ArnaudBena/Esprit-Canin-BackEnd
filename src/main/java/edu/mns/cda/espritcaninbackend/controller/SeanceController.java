@@ -1,6 +1,7 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.espritcaninbackend.dto.PrerequisDto;
 import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
 import edu.mns.cda.espritcaninbackend.model.Inscription;
 import edu.mns.cda.espritcaninbackend.security.*;
@@ -244,6 +245,13 @@ public class SeanceController {
         return seanceService.catalogueDetail(id)
                 .map(dto -> new ResponseEntity<>(dto, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/catalogue/{id}/prerequis")
+    @Operation(summary = "Compétences prérequises d'une séance (adhérent connecté)")
+    @IsAdherent
+    public List<PrerequisDto> getPrerequis(@PathVariable Integer id) {
+        return seanceService.prerequis(id);
     }
 
     // Espace coach
