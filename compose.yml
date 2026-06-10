@@ -1,3 +1,5 @@
+name: esprit-canin-backend
+
 services:
   postgres:
     image: postgres:18
@@ -20,3 +22,4 @@ services:
 
 volumes:
   postgres_data:
+    name: club-canin-backend_postgres_data
