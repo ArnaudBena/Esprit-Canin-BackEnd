@@ -58,9 +58,10 @@ public class InscriptionService {
             throw new SeancePasseeException(seanceId);
         }
 
-        // 2. Pas de doublon (unicité chien + séance)
+        // 2. Doublon vs réinscription : une ligne ANNULEE ne bloque pas (on la réactivera)
         Inscription.Key key = new Inscription.Key(chienId, seanceId);
-        if (inscriptionDao.findById(key).isPresent()) {
+        Optional<Inscription> existante = inscriptionDao.findById(key);
+        if (existante.isPresent() && existante.get().getStatutPresence() != StatutPresence.ANNULEE) {
             throw new InscriptionDoublonException(chienId, seanceId);
         }
 
@@ -94,12 +95,13 @@ public class InscriptionService {
             }
         }
 
-        // 6. Tout est OK → on crée l'inscription
-        Inscription inscription = new Inscription();
+        // 6. Tout est OK → réactivation de l'inscription annulée, sinon création
+        Inscription inscription = existante.orElseGet(Inscription::new);
         inscription.setId(key);
         inscription.setChien(chien);
         inscription.setSeance(seance);
-        inscription.setStatutPresence(StatutPresence.INSCRIT); // valeur initiale (corrige le NOT NULL)
+        inscription.setStatutPresence(StatutPresence.INSCRIT);
+        inscription.setAcquisitionValidee(false); // réinscription : on repart à zéro
         return inscriptionDao.save(inscription);
     }
 

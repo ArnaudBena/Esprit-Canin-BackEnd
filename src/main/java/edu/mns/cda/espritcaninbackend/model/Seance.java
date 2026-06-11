@@ -63,7 +63,7 @@ public class Seance {
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @ManyToOne
     @JoinColumn(name = "id_coach", nullable = false)
-    @JsonView(SeanceView.class)
+    @JsonView({SeanceView.class, InscriptionView.class})
     protected Utilisateur coach;
 
     @OneToMany(mappedBy = "seance")

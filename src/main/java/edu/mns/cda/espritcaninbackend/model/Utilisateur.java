@@ -3,6 +3,7 @@ package edu.mns.cda.espritcaninbackend.model;
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.mns.cda.espritcaninbackend.utile.ValidationGroupe;
 import edu.mns.cda.espritcaninbackend.view.ChienView;
+import edu.mns.cda.espritcaninbackend.view.InscriptionView;
 import edu.mns.cda.espritcaninbackend.view.SeanceView;
 import edu.mns.cda.espritcaninbackend.view.UtilisateurView;
 import jakarta.persistence.*;
@@ -24,7 +25,7 @@ import java.util.List;
 public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView({UtilisateurView.class, ChienView.class, SeanceView.class})
+    @JsonView({UtilisateurView.class, ChienView.class, SeanceView.class, InscriptionView.class})
     protected Integer id;
 
     @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
@@ -32,7 +33,7 @@ public class Utilisateur {
     @Column(nullable = false, length = 50)
     @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
     ValidationGroupe.OnInscription.class})
-    @JsonView({UtilisateurView.class,ChienView.class, SeanceView.class})
+    @JsonView({UtilisateurView.class,ChienView.class, SeanceView.class, InscriptionView.class})
     protected String nom;
 
     @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
@@ -40,7 +41,7 @@ public class Utilisateur {
     @Column(nullable = false, length = 50)
     @Size(max = 50, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
     ValidationGroupe.OnInscription.class})
-    @JsonView({UtilisateurView.class,ChienView.class, SeanceView.class})
+    @JsonView({UtilisateurView.class,ChienView.class, SeanceView.class, InscriptionView.class})
     protected String prenom;
 
     @NotBlank(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class, ValidationGroupe.OnProfilUpdate.class,
