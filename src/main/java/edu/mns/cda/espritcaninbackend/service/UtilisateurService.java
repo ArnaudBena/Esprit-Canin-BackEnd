@@ -211,4 +211,30 @@ public class UtilisateurService {
         }
         utilisateurDao.deleteById(utilisateur.getId());
     }
+
+    /**
+     * Changement de mot de passe par l'utilisateur lui-même : exige l'ancien
+     * mot de passe (vérifié via passwordEncoder.matches) avant d'enregistrer le
+     * nouveau.
+     */
+    public void changeMonPassword(int id, String ancienPassword, String nouveauPassword) {
+        if (nouveauPassword == null || nouveauPassword.length() < 8) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Le mot de passe doit faire au moins 8 caractères."
+            );
+        }
+        Utilisateur existant = utilisateurDao.findById(id)
+                .orElseThrow(() -> new UtilisateurNotFoundException(id));
+
+        if (ancienPassword == null || !passwordEncoder.matches(ancienPassword, existant.getPassword())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Ancien mot de passe incorrect."
+            );
+        }
+
+        existant.setPassword(passwordEncoder.encode(nouveauPassword));
+        utilisateurDao.save(existant);
+    }
 }
