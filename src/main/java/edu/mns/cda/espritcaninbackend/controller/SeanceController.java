@@ -260,8 +260,10 @@ public class SeanceController {
     @Operation(summary = "Mes séances (coach connecté)")
     @IsCoach
     @JsonView(SeanceView.class)
-    public List<Seance> getMesSeances(@AuthenticationPrincipal UtilisateurDetails userDetails) {
-        return seanceService.mesSeances(userDetails.getUtilisateur().getId());
+    public List<Seance> getMesSeances(@AuthenticationPrincipal UtilisateurDetails userDetails,
+                                      @RequestParam(required = false) String periode,
+                                      @RequestParam(required = false) Integer typeSeanceId) {
+        return seanceService.mesSeances(userDetails.getUtilisateur().getId(), periode, typeSeanceId);
     }
 
     @GetMapping("/mes-seances-a-traiter")
