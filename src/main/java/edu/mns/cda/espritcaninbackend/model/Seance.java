@@ -66,7 +66,7 @@ public class Seance {
     @JsonView({SeanceView.class, InscriptionView.class})
     protected Utilisateur coach;
 
-    @OneToMany(mappedBy = "seance")
+    @OneToMany(mappedBy = "seance", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JsonView(SeanceView.class)
     protected List<Inscription> inscriptions;
 
@@ -75,7 +75,10 @@ public class Seance {
         if (inscriptions == null || typeSeance == null || typeSeance.getParticipantsMaximum() == null) {
             return false;
         }
-        return inscriptions.size() >= typeSeance.getParticipantsMaximum();
+        long actives = inscriptions.stream()
+                .filter(i -> i.getStatutPresence() != StatutPresence.ANNULEE)
+                .count();
+        return actives >= typeSeance.getParticipantsMaximum();
     }
 
     @JsonView({SeanceView.class, InscriptionView.class, ChienView.class})

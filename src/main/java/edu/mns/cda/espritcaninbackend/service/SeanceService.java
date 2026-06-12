@@ -18,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,7 +89,10 @@ public class SeanceService {
         }
 
         Seance seance = optionalSeance.get();
-        if (seance.getInscriptions() != null && !seance.getInscriptions().isEmpty()) {
+        boolean aInscriptionActive = seance.getInscriptions() != null
+                && seance.getInscriptions().stream()
+                .anyMatch(i -> i.getStatutPresence() != StatutPresence.ANNULEE);
+        if (aInscriptionActive) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Cette séance a des inscriptions. Annulez-la avant de la supprimer"
@@ -200,10 +204,22 @@ public class SeanceService {
     /**
      * Espace coach : toutes mes séances.
      */
-    public List<Seance> mesSeances(int coachId) {
-        return seanceDao.findByCoach(coachId);
+    public List<Seance> mesSeances(int coachId, String periode, Integer typeSeanceId) {
+        LocalDate today = LocalDate.now();
+        boolean filtrerPeriode = false;
+        LocalDate debut = null;
+        LocalDate fin = null;
+        if ("semaine".equals(periode)) {
+            filtrerPeriode = true;
+            debut = today.with(ChronoField.DAY_OF_WEEK, 1); // lundi
+            fin = today.with(ChronoField.DAY_OF_WEEK, 7);   // dimanche
+        } else if ("mois".equals(periode)) {
+            filtrerPeriode = true;
+            debut = today.withDayOfMonth(1);
+            fin = today.withDayOfMonth(today.lengthOfMonth());
+        }
+        return seanceDao.findByCoach(coachId, typeSeanceId, filtrerPeriode, debut, fin);
     }
-
     /**
      * Espace coach : mes séances à traiter (passées + appel non fait).
      * Filtre final "terminée" en datetime précis (exclut une séance du jour pas encore finie).
