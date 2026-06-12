@@ -18,7 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Optional;
 
@@ -206,22 +205,22 @@ public class SeanceService {
      */
     public List<Seance> mesSeances(int coachId, String periode, Integer typeSeanceId) {
         LocalDate today = LocalDate.now();
-        boolean filtrerPeriode = false;
-        LocalDate debut = null;
-        LocalDate fin = null;
-        if ("semaine".equals(periode)) {
-            filtrerPeriode = true;
-            debut = today.with(ChronoField.DAY_OF_WEEK, 1); // lundi
-            fin = today.with(ChronoField.DAY_OF_WEEK, 7);   // dimanche
-        } else if ("mois".equals(periode)) {
-            filtrerPeriode = true;
-            debut = today.withDayOfMonth(1);
-            fin = today.withDayOfMonth(today.lengthOfMonth());
+        boolean filtrerDepuis = false;
+        boolean filtrerJusqua = false;
+        LocalDate depuis = null;
+        LocalDate jusqua = null;
+        if ("passees".equals(periode)) {
+            filtrerJusqua = true;
+            jusqua = today;          // date < aujourd'hui
+        } else if (!"toutes".equals(periode)) {
+            filtrerDepuis = true;    // défaut = à venir
+            depuis = today;          // date >= aujourd'hui
         }
-        return seanceDao.findByCoach(coachId, typeSeanceId, filtrerPeriode, debut, fin);
+        return seanceDao.findByCoach(coachId, typeSeanceId, filtrerDepuis, depuis, filtrerJusqua, jusqua);
     }
+
     /**
-     * Espace coach : mes séances à traiter (passées + appel non fait).
+     * Mes séances à traiter (passées + appel non fait).
      * Filtre final "terminée" en datetime précis (exclut une séance du jour pas encore finie).
      */
     public List<Seance> mesSeancesATraiter(int coachId) {

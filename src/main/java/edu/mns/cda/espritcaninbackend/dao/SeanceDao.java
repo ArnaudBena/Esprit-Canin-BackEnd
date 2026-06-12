@@ -129,18 +129,20 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
 
     /**
      * Séances d'un coach, triées chronologiquement (ASC), avec filtres optionnels :
-     * type de séance + fourchette de dates (période). null = filtre ignoré.
+     * type + bornes de date (à venir / passées).
      */
     @Query("SELECT s FROM Seance s " +
             "WHERE s.coach.id = :coachId " +
             "AND (:typeSeanceId IS NULL OR s.typeSeance.id = :typeSeanceId) " +
-            "AND (:filtrerPeriode = FALSE OR s.date BETWEEN :debut AND :fin) " +
+            "AND (:filtrerDepuis = FALSE OR s.date >= :depuis) " +
+            "AND (:filtrerJusqua = FALSE OR s.date < :jusqua) " +
             "ORDER BY s.date ASC, s.heureDebut ASC")
     List<Seance> findByCoach(@Param("coachId") Integer coachId,
                              @Param("typeSeanceId") Integer typeSeanceId,
-                             @Param("filtrerPeriode") boolean filtrerPeriode,
-                             @Param("debut") LocalDate debut,
-                             @Param("fin") LocalDate fin);
+                             @Param("filtrerDepuis") boolean filtrerDepuis,
+                             @Param("depuis") LocalDate depuis,
+                             @Param("filtrerJusqua") boolean filtrerJusqua,
+                             @Param("jusqua") LocalDate jusqua);
 
     /**
      * Séances "à traiter" d'un coach : ACTIVE, dont au moins une inscription est encore INSCRIT
