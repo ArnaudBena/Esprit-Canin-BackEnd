@@ -1,6 +1,7 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import edu.mns.cda.espritcaninbackend.dto.CommentaireRequestDto;
 import edu.mns.cda.espritcaninbackend.dto.InscriptionRequestDto;
 import edu.mns.cda.espritcaninbackend.dto.PresenceRequestDto;
 import edu.mns.cda.espritcaninbackend.model.Chien;
@@ -311,6 +312,32 @@ public class InscriptionController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         inscriptionService.validerAcquisition(key);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PatchMapping("/{idChien}/{idSeance}/commentaire")
+    @Operation(summary = "Commentaire du coach sur une inscription (coach de la séance ou admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Commentaire enregistré"),
+            @ApiResponse(responseCode = "403", description = "Pas le coach de cette séance"),
+            @ApiResponse(responseCode = "404", description = "Inscription introuvable")
+    })
+    @IsCoachOuAdmin
+    public ResponseEntity<Void> commenter(
+            @AuthenticationPrincipal UtilisateurDetails userDetails,
+            @PathVariable Integer idChien,
+            @PathVariable Integer idSeance,
+            @RequestBody @Valid CommentaireRequestDto request
+    ) {
+        Inscription.Key key = new Inscription.Key(idChien, idSeance);
+        Optional<Inscription> optionalInscription = inscriptionService.findById(key);
+        if (optionalInscription.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        if (!estAdminOuCoachDeLaSeance(optionalInscription.get().getSeance(), userDetails)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        inscriptionService.commenter(key, request.commentaire());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -251,4 +251,11 @@ public class InscriptionService {
         cc.setDateAcquisition(dateSeance);
         chienCompetenceDao.save(cc);
     }
+
+    public void commenter(Inscription.Key key, String commentaire) {
+        Inscription inscription = inscriptionDao.findById(key)
+                .orElseThrow(() -> new InscriptionNotFoundException(key.getChienId(), key.getSeanceId()));
+        inscription.setCommentaireCoach(commentaire);
+        inscriptionDao.save(inscription);
+    }
 }
