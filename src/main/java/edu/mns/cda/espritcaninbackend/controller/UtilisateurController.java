@@ -329,26 +329,29 @@ public class UtilisateurController {
             summary = "Changer mon mot de passe",
             description = """
                     Met à jour le mot de passe de l'utilisateur connecté.
-                    Le nouveau mot de passe doit faire au moins 8 caractères.
+                    Exige l'ancien mot de passe (vérifié), et un nouveau d'au moins 8 caractères.
                     """
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Mot de passe mis à jour avec succès"),
-            @ApiResponse(responseCode = "400", description = "Mot de passe trop court (min 8 caractères) ou manquant")
+            @ApiResponse(responseCode = "400", description = "Ancien mot de passe incorrect, ou nouveau trop court (min 8 caractères)")
     })
     public ResponseEntity<Void> updateMonPassword(
             @AuthenticationPrincipal UtilisateurDetails utilisateurDetails,
-            @RequestBody PasswordUpdateRequest body
+            @RequestBody ChangePasswordRequest body
     ) {
-        utilisateurService.updatePassword(
+        utilisateurService.changeMonPassword(
                 utilisateurDetails.getUtilisateur().getId(),
-                body == null ? null : body.password()
+                body == null ? null : body.ancienPassword(),
+                body == null ? null : body.nouveauPassword()
         );
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     public record PasswordUpdateRequest(String password) {}
+
+    public record ChangePasswordRequest(String ancienPassword, String nouveauPassword) {}
 
     @DeleteMapping("/profil")
     @IsConnecte

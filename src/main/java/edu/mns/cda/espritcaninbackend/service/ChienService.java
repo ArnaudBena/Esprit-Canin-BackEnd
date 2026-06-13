@@ -4,6 +4,7 @@ import edu.mns.cda.espritcaninbackend.dao.ChienDao;
 import edu.mns.cda.espritcaninbackend.exception.ChienNotFoundException;
 import edu.mns.cda.espritcaninbackend.model.Chien;
 import edu.mns.cda.espritcaninbackend.model.Sexe;
+import edu.mns.cda.espritcaninbackend.model.StatutPresence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -67,10 +68,15 @@ public class ChienService {
         Chien chien = chienDao.findById(id)
                 .orElseThrow(() -> new ChienNotFoundException(id));
 
-        if (!chien.getInscriptions().isEmpty()) {
+        // On bloque seulement s'il existe une inscription NON annulée (participation réelle
+        // ou engagement à venir). Les inscriptions annulées ne comptent pas : le chien n'a
+        // jamais participé, et elles partent en cascade avec lui.
+        boolean aInscriptionActive = chien.getInscriptions().stream()
+                .anyMatch(i -> i.getStatutPresence() != StatutPresence.ANNULEE);
+        if (aInscriptionActive) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "Ce chien a des inscriptions enregistrées. Suppression impossible (conservation de l'historique)."
+                    "Ce chien a participé ou est inscrit à des séances. Suppression impossible (conservation de l'historique)."
             );
         }
 

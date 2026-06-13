@@ -1,5 +1,6 @@
 package edu.mns.cda.espritcaninbackend.dao;
 
+import edu.mns.cda.espritcaninbackend.dto.PrerequisDto;
 import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
 import edu.mns.cda.espritcaninbackend.model.Seance;
 import edu.mns.cda.espritcaninbackend.model.StatutPresence;
@@ -118,11 +119,30 @@ public interface SeanceDao extends JpaRepository<Seance, Integer> {
     Optional<SeanceCatalogueDto> catalogueById(@Param("id") Integer id,
                                                @Param("annulee") StatutPresence annulee);
 
+    @Query("""
+        SELECT new edu.mns.cda.espritcaninbackend.dto.PrerequisDto(c.nom, tsc.niveauMinimumRequis)
+        FROM TypeSeanceCompetence tsc
+        JOIN tsc.competence c
+        WHERE tsc.typeSeance.id = (SELECT s.typeSeance.id FROM Seance s WHERE s.id = :seanceId)
+        """)
+    List<PrerequisDto> findPrerequisBySeanceId(@Param("seanceId") int seanceId);
+
     /**
-     * Toutes les séances d'un coach (les plus récentes d'abord).
+     * Séances d'un coach, triées chronologiquement (ASC), avec filtres optionnels :
+     * type + bornes de date (à venir / passées).
      */
-    @Query("SELECT s FROM Seance s WHERE s.coach.id = :coachId ORDER BY s.date DESC, s.heureDebut DESC")
-    List<Seance> findByCoach(@Param("coachId") Integer coachId);
+    @Query("SELECT s FROM Seance s " +
+            "WHERE s.coach.id = :coachId " +
+            "AND (:typeSeanceId IS NULL OR s.typeSeance.id = :typeSeanceId) " +
+            "AND (:filtrerDepuis = FALSE OR s.date >= :depuis) " +
+            "AND (:filtrerJusqua = FALSE OR s.date < :jusqua) " +
+            "ORDER BY s.date ASC, s.heureDebut ASC")
+    List<Seance> findByCoach(@Param("coachId") Integer coachId,
+                             @Param("typeSeanceId") Integer typeSeanceId,
+                             @Param("filtrerDepuis") boolean filtrerDepuis,
+                             @Param("depuis") LocalDate depuis,
+                             @Param("filtrerJusqua") boolean filtrerJusqua,
+                             @Param("jusqua") LocalDate jusqua);
 
     /**
      * Séances "à traiter" d'un coach : ACTIVE, dont au moins une inscription est encore INSCRIT

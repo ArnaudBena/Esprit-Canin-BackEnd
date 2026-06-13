@@ -46,4 +46,11 @@ public interface UtilisateurDao extends JpaRepository<Utilisateur, Integer> {
      * Uniquement pour les requetes simples : SELECT * FROM utilisateur WHERE email = ?
      */
     Optional<Utilisateur> findByEmail(String email);
+
+    /**
+     * Compte les utilisateurs d'un rôle donné (par nom).
+     * Utilisé par AdminInitializer pour savoir s'il existe déjà un admin.
+     */
+    @Query("SELECT COUNT(u) FROM Utilisateur u WHERE u.role.nom = :roleNom")
+    long countByRoleNom(@Param("roleNom") String roleNom);
 }

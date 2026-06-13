@@ -3,6 +3,7 @@ package edu.mns.cda.espritcaninbackend.service;
 import edu.mns.cda.espritcaninbackend.dao.SeanceDao;
 import edu.mns.cda.espritcaninbackend.dao.TypeSeanceDao;
 import edu.mns.cda.espritcaninbackend.dao.UtilisateurDao;
+import edu.mns.cda.espritcaninbackend.dto.PrerequisDto;
 import edu.mns.cda.espritcaninbackend.dto.SeanceCatalogueDto;
 import edu.mns.cda.espritcaninbackend.exception.SeanceNotFoundException;
 import edu.mns.cda.espritcaninbackend.model.Seance;
@@ -65,6 +66,10 @@ public class SeanceService {
         return seanceDao.catalogueById(id, StatutPresence.ANNULEE);
     }
 
+    public List<PrerequisDto> prerequis(int seanceId) {
+        return seanceDao.findPrerequisBySeanceId(seanceId);
+    }
+
     public void insert(Seance seance) {
         seance.setId(null);
         if (seance.getStatut() == null) {
@@ -83,7 +88,10 @@ public class SeanceService {
         }
 
         Seance seance = optionalSeance.get();
-        if (seance.getInscriptions() != null && !seance.getInscriptions().isEmpty()) {
+        boolean aInscriptionActive = seance.getInscriptions() != null
+                && seance.getInscriptions().stream()
+                .anyMatch(i -> i.getStatutPresence() != StatutPresence.ANNULEE);
+        if (aInscriptionActive) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Cette séance a des inscriptions. Annulez-la avant de la supprimer"
@@ -195,12 +203,24 @@ public class SeanceService {
     /**
      * Espace coach : toutes mes séances.
      */
-    public List<Seance> mesSeances(int coachId) {
-        return seanceDao.findByCoach(coachId);
+    public List<Seance> mesSeances(int coachId, String periode, Integer typeSeanceId) {
+        LocalDate today = LocalDate.now();
+        boolean filtrerDepuis = false;
+        boolean filtrerJusqua = false;
+        LocalDate depuis = null;
+        LocalDate jusqua = null;
+        if ("passees".equals(periode)) {
+            filtrerJusqua = true;
+            jusqua = today;          // date < aujourd'hui
+        } else if (!"toutes".equals(periode)) {
+            filtrerDepuis = true;    // défaut = à venir
+            depuis = today;          // date >= aujourd'hui
+        }
+        return seanceDao.findByCoach(coachId, typeSeanceId, filtrerDepuis, depuis, filtrerJusqua, jusqua);
     }
 
     /**
-     * Espace coach : mes séances à traiter (passées + appel non fait).
+     * Mes séances à traiter (passées + appel non fait).
      * Filtre final "terminée" en datetime précis (exclut une séance du jour pas encore finie).
      */
     public List<Seance> mesSeancesATraiter(int coachId) {
