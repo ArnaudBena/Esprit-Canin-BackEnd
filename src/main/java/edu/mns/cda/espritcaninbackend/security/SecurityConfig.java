@@ -65,12 +65,12 @@ public class SecurityConfig {
     }
 
     /**
-     * Config CORS permissive pour le dev (origin *, toutes méthodes, tous headers).
-     * À durcir en prod : remplacer "*" par l'URL exacte du front.
+     * CORS restreint à l'origine du front Angular (dev : localhost:4200).
+     * Méthodes/headers explicites. Ajouter ici l'URL de prod le moment venu.
      */
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("*"));
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT", "PATCH"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
 
