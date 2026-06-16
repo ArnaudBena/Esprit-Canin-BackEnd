@@ -30,7 +30,7 @@ import java.util.Map;
 public class AuthController {
 
     @Value("${jwt.secret}")
-    protected String SECRET; // TODO : Externaliser dans app.properties (doit matcher le JwtFilter) > fait a check ?
+    protected String SECRET;
 
     protected final UtilisateurService utilisateurService;
     protected final AuthenticationProvider authenticationProvider;

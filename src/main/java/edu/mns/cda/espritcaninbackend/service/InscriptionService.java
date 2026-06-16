@@ -35,7 +35,7 @@ public class InscriptionService {
     }
 
     /**
-     * Inscrit un chien à une séance après avoir validé les 5 règles métier (RG03).
+     * Inscrit un chien à une séance après avoir validé les 5 règles métier.
      * @Transactional : opération multi-étapes (lectures + écriture) → atomicité.
      */
     @Transactional

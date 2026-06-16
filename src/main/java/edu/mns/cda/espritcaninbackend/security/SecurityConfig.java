@@ -22,7 +22,7 @@ import java.util.List;
  * Configuration centrale de Spring Security.
  *
  * - CSRF désactivé : pas besoin pour une API stateless (CSRF protège les
- *   sessions cookie-based, je n'en ai pas).
+ *   sessions cookie, je n'en ai pas).
  * - Sessions STATELESS : pas de HttpSession côté serveur, chaque requête
  *   doit porter son JWT.
  * - CORS activé : le front Angular tourne sur un autre port (4200) et

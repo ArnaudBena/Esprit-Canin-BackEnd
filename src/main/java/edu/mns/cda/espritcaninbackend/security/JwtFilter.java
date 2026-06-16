@@ -25,15 +25,13 @@ import java.io.IOException;
  * Approche DB-driven comme vu en cours : le rôle vient de la BDD, pas du token → si l'admin
  * change le rôle d'un user, ça s'applique à la prochaine requête sans
  * attendre l'expiration du token.
- *
- * TODO post-MVP : externaliser le secret dans application.properties.
  */
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     @Value("${jwt.secret}")
-    protected String SECRET; // TODO : Externaliser dans app.properties (doit matcher le JwtFilter) > fait a check ?
+    protected String SECRET;
 
     protected final UserDetailsService userDetailsService;
 
