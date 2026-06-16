@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Gestionnaire global d'exceptions pour transformer les exceptions Java en réponses HTTP propres.
  *
- * Convention du projet : exceptions UNCHECKED (héritent de RuntimeException)
+ * Les exceptions UNCHECKED (héritent de RuntimeException)
  * Toutes les exceptions custom du projet (XxxNotFoundException) héritent de RuntimeException.
  *  - Pas besoin de `throws XxxException` dans toutes les signatures de méthodes.
  *  - Les exceptions remontent naturellement jusqu'à ce @RestControllerAdvice qui les mappe en HTTP.
@@ -49,6 +49,12 @@ public class GlobalExceptionInterceptor {
     @ExceptionHandler(SeanceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> seanceNotFound(SeanceNotFoundException ex) {
+        return Map.of("erreur", ex.getMessage());
+    }
+
+    @ExceptionHandler(TypeSeanceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> typeSeanceNotFound(TypeSeanceNotFoundException ex) {
         return Map.of("erreur", ex.getMessage());
     }
 
