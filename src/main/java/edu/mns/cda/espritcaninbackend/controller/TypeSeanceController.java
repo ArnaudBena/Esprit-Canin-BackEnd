@@ -1,7 +1,7 @@
 package edu.mns.cda.espritcaninbackend.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import edu.mns.cda.espritcaninbackend.dao.TypeSeanceDao;
+import edu.mns.cda.espritcaninbackend.service.TypeSeanceService;
 import edu.mns.cda.espritcaninbackend.model.TypeSeance;
 import edu.mns.cda.espritcaninbackend.security.IsAdmin;
 import edu.mns.cda.espritcaninbackend.security.IsConnecte;
@@ -32,7 +32,7 @@ import java.util.Optional;
 @IsAdmin
 public class TypeSeanceController {
 
-    protected final TypeSeanceDao typeSeanceDao;
+    protected final TypeSeanceService typeSeanceService;
 
     @GetMapping("/list")
     @Operation(
@@ -49,7 +49,7 @@ public class TypeSeanceController {
     @JsonView(TypeSeanceView.class)
     @IsConnecte
     public List<TypeSeance> getAllTypesSeance() {
-        return typeSeanceDao.findAllOrderByLibelle();
+        return typeSeanceService.findAll();
     }
 
     @GetMapping("/{id}")
@@ -69,7 +69,7 @@ public class TypeSeanceController {
             @Parameter(description = "Identifiant unique du type de séance", required = true, example = "1")
             @PathVariable Integer id
     ) {
-        Optional<TypeSeance> optionalTypeSeance = typeSeanceDao.findById(id);
+        Optional<TypeSeance> optionalTypeSeance = typeSeanceService.findById(id);
 
         if (optionalTypeSeance.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -99,9 +99,7 @@ public class TypeSeanceController {
             @RequestBody
             @Valid TypeSeance typeSeanceToInsert
     ) {
-        typeSeanceToInsert.setId(null);
-
-        typeSeanceDao.save(typeSeanceToInsert);
+        typeSeanceService.insert(typeSeanceToInsert);
 
         return new ResponseEntity<>(typeSeanceToInsert, HttpStatus.CREATED);
     }
@@ -119,17 +117,11 @@ public class TypeSeanceController {
             @ApiResponse(responseCode = "204", description = "Type de séance supprimé avec succès, aucun contenu retourné"),
             @ApiResponse(responseCode = "404", description = "Aucun type de séance ne correspond à cet ID")
     })
-    public ResponseEntity<TypeSeance> deleteTypeSeance(
+    public ResponseEntity<Void> deleteTypeSeance(
             @Parameter(description = "Identifiant unique du type de séance à supprimer", required = true, example = "1")
             @PathVariable Integer id
     ) {
-        Optional<TypeSeance> optionalTypeSeance = typeSeanceDao.findById(id);
-
-        if (optionalTypeSeance.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        typeSeanceDao.deleteById(id);
+        typeSeanceService.delete(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -160,15 +152,7 @@ public class TypeSeanceController {
             @Valid
             TypeSeance typeSeanceToUpdate
     ) {
-        Optional<TypeSeance> optionalTypeSeance = typeSeanceDao.findById(id);
-
-        if (optionalTypeSeance.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        typeSeanceToUpdate.setId(id);
-
-        typeSeanceDao.save(typeSeanceToUpdate);
+        typeSeanceService.update(id, typeSeanceToUpdate);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

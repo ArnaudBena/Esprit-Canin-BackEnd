@@ -45,7 +45,7 @@ public class Seance {
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
     @Column(nullable = false)
     @Min(value = 1, groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class}, message = "La durée doit être positive")
-    @JsonView(SeanceView.class)
+    @JsonView({SeanceView.class, InscriptionView.class})
     protected Integer dureeMinutes;
 
     @NotNull(groups = {ValidationGroupe.OnCreate.class, ValidationGroupe.OnUpdate.class})
