@@ -39,6 +39,7 @@ services:
       DDL_AUTO: ${DDL_AUTO}
       SQL_FILE: ${SQL_FILE}
       SQL_INIT_MODE: ${SQL_INIT_MODE}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
     depends_on:
       db:
         condition: service_healthy
