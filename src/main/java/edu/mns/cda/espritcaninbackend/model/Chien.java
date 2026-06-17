@@ -67,7 +67,7 @@ public class Chien {
     @JsonView({ChienView.class, SeanceView.class, InscriptionView.class})
     protected Utilisateur utilisateur;
 
-    @NotNull // a enlever comme utilisateur ?
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "id_race", nullable = false)
     @JsonView({ChienView.class,UtilisateurView.class})
