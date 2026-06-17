@@ -1,6 +1,7 @@
 package edu.mns.cda.espritcaninbackend.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -25,8 +26,7 @@ import java.util.List;
  *   sessions cookie, je n'en ai pas).
  * - Sessions STATELESS : pas de HttpSession côté serveur, chaque requête
  *   doit porter son JWT.
- * - CORS activé : le front Angular tourne sur un autre port (4200) et
- *   doit pouvoir appeler le back (8080).
+ * - CORS activé
  * - JwtFilter branché AVANT UsernamePasswordAuthenticationFilter : on
  *   alimente le SecurityContext depuis le JWT avant les filtres standards.
  * - @EnableMethodSecurity : active @PreAuthorize sur les méthodes des
@@ -41,6 +41,8 @@ public class SecurityConfig {
     protected final PasswordEncoder passwordEncoder;
     protected final UtilisateurDetailsService utilisateurDetailsService;
     protected final JwtFilter jwtFilter;
+    @Value("${cors.allowed-origins}")
+    private String allowedOrigins;
 
     /**
      * AuthenticationProvider utilisé par AuthenticationManager pour le login :
@@ -70,7 +72,7 @@ public class SecurityConfig {
      */
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200"));
+        corsConfiguration.setAllowedOrigins(List.of(allowedOrigins.split(",")));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "DELETE", "PUT", "PATCH"));
         corsConfiguration.setAllowedHeaders(List.of("*"));
 
