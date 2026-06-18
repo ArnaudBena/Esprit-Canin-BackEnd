@@ -82,15 +82,16 @@ public class InscriptionService {
             throw new SeanceCompleteException(seanceId, type.getParticipantsMaximum());
         }
 
-        // 5. Compétences requises (necessite) : niveau du chien >= niveau requis.
+        // 5. Compétences requises (necessite) : le chien doit AVOIR acquis la compétence
+        //    à un niveau >= requis. Pas de ligne = non acquise = bloqué.
         //    Liste vide = séance libre = aucune vérif.
         if (type.getTypeSeancesCompetences() != null) {
             for (TypeSeanceCompetence requis : type.getTypeSeancesCompetences()) {
                 NiveauCompetence niveauRequis = requis.getNiveauMinimumRequis();
-                NiveauCompetence niveauChien = niveauDuChien(chien, requis.getCompetence().getId());
-                if (niveauChien.ordinal() < niveauRequis.ordinal()) {
+                Optional<NiveauCompetence> niveauChien = niveauDuChien(chien, requis.getCompetence().getId());
+                if (niveauChien.isEmpty() || niveauChien.get().ordinal() < niveauRequis.ordinal()) {
                     throw new EligibiliteCompetenceException(
-                            requis.getCompetence().getNom(), niveauRequis, niveauChien);
+                            requis.getCompetence().getNom(), niveauRequis, niveauChien.orElse(null));
                 }
             }
         }
@@ -107,17 +108,16 @@ public class InscriptionService {
 
     /**
      * Niveau actuel du chien sur une compétence donnée.
-     * absence de ligne dans `maitriser` (chienCompetences) = DEBUTANT par défaut.
+     * Optional vide = aucune ligne = compétence non acquise (sous le niveau débutant).
      */
-    private NiveauCompetence niveauDuChien(Chien chien, Integer competenceId) {
+    private Optional<NiveauCompetence> niveauDuChien(Chien chien, Integer competenceId) {
         if (chien.getChienCompetences() == null) {
-            return NiveauCompetence.DEBUTANT;
+            return Optional.empty();
         }
         return chien.getChienCompetences().stream()
                 .filter(cc -> cc.getCompetence().getId().equals(competenceId))
                 .map(ChienCompetence::getNiveauActuel)
-                .findFirst()
-                .orElse(NiveauCompetence.DEBUTANT);
+                .findFirst();
     }
 
     public void delete(Inscription.Key key) {
@@ -234,12 +234,10 @@ public class InscriptionService {
         ChienCompetence.Key key = new ChienCompetence.Key(chien.getId(), competence.getId());
         Optional<ChienCompetence> existante = chienCompetenceDao.findById(key);
 
-        NiveauCompetence niveauActuel = existante
-                .map(ChienCompetence::getNiveauActuel)
-                .orElse(NiveauCompetence.DEBUTANT);   // RG01
-
-        // on n'agit QUE si le niveau conféré est strictement supérieur
-        if (niveauConfere.ordinal() <= niveauActuel.ordinal()) {
+        // Pas de ligne = non acquise -> on crée toujours. Sinon on ne progresse que si
+        // le niveau conféré est strictement supérieur (pas de rétrogradation).
+        if (existante.isPresent()
+                && niveauConfere.ordinal() <= existante.get().getNiveauActuel().ordinal()) {
             return;
         }
 

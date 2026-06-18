@@ -28,11 +28,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * Lancé en IDE uniquement (package `integration` exclu du `mvn test`).
  *
- * Rappels du seed :
- *  - jean.dupont@mail.fr (Adhérent) possède Rex(1), Luna(2) ; Rex est inscrit séance 1.
+ * Rappels du seed (V1) :
+ *  - jean.dupont@mail.fr (Adhérent) possède Rex(1), Luna(2) ; Rex inscrit S1.
  *  - Bella(3) appartient à Sophie (id 2).
- *  - Séances : 1 (futur, type Obéissance), 2 (passée, type Agilité, Bella inscrite),
- *              3 (futur, Agilité), 4 (futur, Pistage). Coach des 4 = Lucas.
+ *  - Coachs : Lucas(12), Camille(13), Thomas(14).
+ *  - S1 (Obé déb, passée, coach Lucas) : Rex & Luna PRESENT.
+ *  - S11/S13 (à venir, coach Thomas) ; Volt(11) inscrit S13.
  */
 @SpringBootTest
 @Transactional
@@ -60,7 +61,7 @@ class InscriptionFluxIntegrationTest {
     void inscrire_casValide_retourne201() throws Exception {
         mvc.perform(post("/inscription/mes-inscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"chienId\":1,\"seanceId\":4}"))
+                        .content("{\"chienId\":1,\"seanceId\":11}"))
                 .andExpect(status().isCreated());
     }
 
@@ -100,19 +101,19 @@ class InscriptionFluxIntegrationTest {
 
     @Test
     @WithUserDetails("lucas.bernard@mail.fr")
-    @DisplayName("Appel : coach marque Bella PRESENT sur séance 2 (terminée) -> 204")
+    @DisplayName("Appel : coach marque Rex PRESENT sur séance 1 (terminée) -> 204")
     void faireAppel_casValide_retourne204() throws Exception {
-        mvc.perform(patch("/inscription/3/2/presence")
+        mvc.perform(patch("/inscription/1/1/presence")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"statutPresence\":\"PRESENT\"}"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    @WithUserDetails("lucas.bernard@mail.fr")
-    @DisplayName("Appel : séance 1 pas encore terminée -> 409")
+    @WithUserDetails("thomas.garcia@mail.fr")
+    @DisplayName("Appel : séance 13 (à venir) pas encore terminée -> 409")
     void faireAppel_seanceNonTerminee_retourne409() throws Exception {
-        mvc.perform(patch("/inscription/1/1/presence")
+        mvc.perform(patch("/inscription/11/13/presence")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"statutPresence\":\"PRESENT\"}"))
                 .andExpect(status().isConflict());
