@@ -102,17 +102,21 @@ public class SeanceService {
     }
 
     public void update(int id, Seance seanceToUpdate) {
-        Optional<Seance> optionalSeance = seanceDao.findById(id);
+        Seance existant = seanceDao.findById(id)
+                .orElseThrow(() -> new SeanceNotFoundException(id));
 
-        if(optionalSeance.isEmpty()) {
-            throw new SeanceNotFoundException(id);
-        }
+        existant.setDate(seanceToUpdate.getDate());
+        existant.setHeureDebut(seanceToUpdate.getHeureDebut());
+        existant.setDureeMinutes(seanceToUpdate.getDureeMinutes());
+        existant.setStatut(seanceToUpdate.getStatut());
+        existant.setTypeSeance(seanceToUpdate.getTypeSeance());
+        existant.setCoach(seanceToUpdate.getCoach());
 
-        seanceToUpdate.setId(id);
-        validerCoach(seanceToUpdate);
-        validerDuree(seanceToUpdate);
-        validerChevauchement(seanceToUpdate);
-        seanceDao.save(seanceToUpdate);
+        validerCoach(existant);
+        validerDuree(existant);
+        validerChevauchement(existant);
+
+        seanceDao.save(existant);
     }
 
     private void validerDuree(Seance seance) {
