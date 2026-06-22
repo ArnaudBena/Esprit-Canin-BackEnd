@@ -50,11 +50,22 @@ public class ChienService {
     }
 
     public void update(int id, Chien chienToUpdate) {
-        if (chienDao.findById(id).isEmpty()) {
-            throw new ChienNotFoundException(id);
-        }
-        chienToUpdate.setId(id);
-        chienDao.save(chienToUpdate);
+        Chien existant = chienDao.findById(id)
+                .orElseThrow(() -> new ChienNotFoundException(id));
+
+        // Mise à jour PARTIELLE : on recopie uniquement les champs éditables sur
+        // l'entité existante. On ne touche jamais aux collections (inscriptions,
+        // chienCompetences) : un save() de l'entité entière déclencherait le
+        // orphanRemoval et supprimerait l'historique et les compétences du chien.
+        existant.setNom(chienToUpdate.getNom());
+        existant.setPoids(chienToUpdate.getPoids());
+        existant.setTaille(chienToUpdate.getTaille());
+        existant.setSexe(chienToUpdate.getSexe());
+        existant.setDateNaissance(chienToUpdate.getDateNaissance());
+        existant.setNumeroPuce(chienToUpdate.getNumeroPuce());
+        existant.setRace(chienToUpdate.getRace());
+
+        chienDao.save(existant);
     }
 
     /**
